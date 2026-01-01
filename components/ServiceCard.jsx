@@ -40,13 +40,7 @@ export default function ServiceCard({ serviceData }) {
         </div>
 
         <div className="flex flex-row justify-end items-center gap-3 mt-2">
-          <Button
-            variant="outline"
-            className="rounded-full border-orange-500 text-orange-500 hover:bg-orange-50 px-4 py-1.5 h-auto text-xs font-bold uppercase"
-          >
-            Details
-          </Button>
-          <Button className="rounded-full bg-orange-500 hover:bg-orange-600 px-4 py-1.5 h-auto text-xs font-bold uppercase shadow-sm">
+          <Button className="rounded-sm bg-orange-500 hover:bg-orange-600 px-4 py-1.5 h-auto text-xs font-bold uppercase shadow-sm">
             Book Now
           </Button>
         </div>
