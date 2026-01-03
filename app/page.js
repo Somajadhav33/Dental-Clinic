@@ -13,7 +13,7 @@ export default function Home() {
     <>
       <Hero />
       <HospitalImageGallery />
-      <div className="text-center mb-12">
+      <div id ="servicesSection"className="text-center mb-12">
         <h2 className="text-4xl font-bold text-blue-900 font-serif">
           Our Services
         </h2>
@@ -25,7 +25,7 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="text-center mb-12">
+      <div id="aboutSection" className="text-center mb-12">
         <h2 className="text-4xl font-bold text-blue-900 font-serif">
           About Us
         </h2>
@@ -33,7 +33,7 @@ export default function Home() {
       </div>
       <AboutPage />
 
-      <div className="text-center mb-12">
+      <div id="contactSection"className="text-center mb-12">
         <h2 className="text-4xl font-bold text-blue-900 font-serif">
           Contact Us
         </h2>
