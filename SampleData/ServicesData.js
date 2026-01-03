@@ -16,7 +16,7 @@ const services = [
     description:
       "Dental imaging to identify hidden problems beneath teeth and gums.",
     image_url: "/images/services/xray.jpg",
-    is_active: true,
+    is_active: false,
     display_order: 2,
   },
   {
@@ -84,7 +84,7 @@ const services = [
     description:
       "Treats infected tooth pulp to relieve pain and save the tooth.",
     image_url: "/images/services/root-canal.jpg",
-    is_active: true,
+    is_active: false,
     display_order: 9,
   },
   {
