@@ -1,10 +1,9 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 
 export default function ServiceCard({ serviceData }) {
   const { name, description, image_url, is_active } = serviceData;
   return (
-    <div className="flex flex-col md:flex-row bg-[#fdf7f3] rounded-2xl border border-orange-200 overflow-hidden w-full min-h-[250px] hover:shadow-md transition-shadow">
+    <div className="flex flex-col md:flex-row bg-[#fdf7f3] rounded-2xl border border-orange-200 overflow-hidden w-full min-h-250px hover:shadow-md transition-shadow">
       {/* Image Section */}
       <div className="w-full md:w-56 lg:w-64 h-56 md:h-auto bg-[#e6dcd2] shrink-0 border-b md:border-b-0 md:border-r border-orange-100">
         <Image
@@ -40,9 +39,9 @@ export default function ServiceCard({ serviceData }) {
         </div>
 
         <div className="flex flex-row justify-end items-center gap-3 mt-2">
-          <Button className="rounded-sm bg-orange-500 hover:bg-orange-600 px-4 py-1.5 h-auto text-xs font-bold uppercase shadow-sm">
+          <button className="rounded-sm text-white bg-orange-500 hover:bg-orange-600 px-4 py-1.5 h-auto text-xs font-bold uppercase shadow-sm">
             Book Now
-          </Button>
+          </button>
         </div>
       </div>
     </div>
