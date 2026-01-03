@@ -221,7 +221,7 @@ const AboutPage = () => {
           <div className="w-full max-w-sm group shadow p-4 border rounded-sm hover:shadow-2xl transition-all duration-300">
             <div className="relative mb-6">
               {/* Profile Image with decorative background */}
-              <div className="relative h-[400px] w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
+              <div className="relative h-100 w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
                 <Image
                   src="/g5.jpg"
                   alt="Dr. Bhushan Dadaso Tale"
@@ -253,7 +253,7 @@ const AboutPage = () => {
           <div className="w-full max-w-sm group shadow p-4 border rounded-sm hover:shadow-2xl transition-all duration-300">
             <div className="relative mb-6">
               {/* Profile Image with decorative background */}
-              <div className="relative h-[400px] w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
+              <div className="relative h-100 w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
                 <Image
                   src="/g5.jpg"
                   alt="Dr. Bhushan Dadaso Tale"

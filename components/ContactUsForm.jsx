@@ -114,7 +114,7 @@ const ContactUsForm = () => {
                     id="name"
                     type="text"
                     required
-                    placeholder="John Doe"
+                    placeholder="Abhishek Jadhav"
                     className="w-full bg-transparent border-b border-gray-200 py-3 outline-none focus:border-gray-900 transition-colors placeholder:text-gray-200 text-lg"
                   />
                 </div>

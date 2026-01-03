@@ -7,11 +7,11 @@ import Image from "next/image";
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Services", href: "/services" },
-  { name: "About Us", href: "/about" },
+  { name: "Services", href: "/#servicesSection" },
+  { name: "About Us", href: "#aboutSection" },
   { name: "FAQ", href: "/faq" },
   { name: "Reviews", href: "/pricing" },
-  { name: "Contact", href: "/contact" },
+  { name: "Contact", href: "/#contactSection" },
 ];
 
 export function NavigationBar() {
@@ -47,7 +47,7 @@ export function NavigationBar() {
         {/* Actions */}
         <div className="flex items-center gap-4">
           <Link
-            href="/get-started"
+            href="/#"
             className="inline-flex rounded-lg  bg-blue-500 px-4 py-2 text-lg font-semibold text-white hover:bg-blue-700 animate-pulse"
           >
             Book Appointment

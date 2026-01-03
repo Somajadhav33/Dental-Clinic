@@ -24,7 +24,7 @@ export default function Hero() {
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight font-serif text-slate-900">
               Smile Brighter,
               <br />
-              <span className="text-sky-600"> Live Healthier </span>
+              <span className="text-indigo-500"> Live Healthier </span>
             </h1>
 
             <p className="text-xl md:text-2xl oklch(37.3% 0.034 259.733) max-w-2xl leading-relaxed">
@@ -36,7 +36,7 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row gap-6 pt-4">
               <a
                 href="#appointments"
-                className="inline-block bg-blue-600 text-white font-semibold text-lg px-8 py-4 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center"
+                className="inline-block bg-primary-500 text-white font-semibold text-lg px-8 py-4 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center"
               >
                 Book an Appointment
               </a>
@@ -44,7 +44,7 @@ export default function Hero() {
                 href="#emergency"
                 className="inline-block bg-white border-2 border-slate-200 text-slate-700 font-semibold text-lg px-8 py-4 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-all duration-300 text-center"
               >
-                Emergency Services
+                Check Appointment Status
               </a>
             </div>
           </div>
