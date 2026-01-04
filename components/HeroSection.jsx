@@ -35,7 +35,7 @@ export default function Hero() {
 
             <div className="flex flex-col sm:flex-row gap-6 pt-4">
               <a
-                href="#appointments"
+                href="/book-appointment"
                 className="inline-block bg-primary-500 text-white font-semibold text-lg px-8 py-4 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center"
               >
                 Book an Appointment
