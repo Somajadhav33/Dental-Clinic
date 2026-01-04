@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ServiceCard({ serviceData }) {
   const { name, description, image_url, is_active } = serviceData;
@@ -39,9 +40,11 @@ export default function ServiceCard({ serviceData }) {
         </div>
 
         <div className="flex flex-row justify-end items-center gap-3 mt-2">
-          <button className="rounded-sm text-white bg-orange-500 hover:bg-orange-600 px-4 py-1.5 h-auto text-xs font-bold uppercase shadow-sm">
-            Book Now
-          </button>
+          <Link href={`/book-appointment?service=${name}`}>
+            <button className="rounded-sm text-white bg-orange-500 hover:bg-orange-600 px-4 py-1.5 h-auto text-xs font-bold uppercase shadow-sm">
+              Book Now
+            </button>
+          </Link>
         </div>
       </div>
     </div>
