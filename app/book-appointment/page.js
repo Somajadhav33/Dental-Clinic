@@ -1,9 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 
-const AppointmentForm = () => {
+const AppointmentFormContent = () => {
   const searchParams = useSearchParams();
 
   const [formData, setFormData] = useState({
@@ -20,7 +20,6 @@ const AppointmentForm = () => {
     const serviceFromUrl = searchParams.get("service");
     if (serviceFromUrl) {
       const decodedService = decodeURIComponent(serviceFromUrl);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData((prev) => ({ ...prev, service: decodedService }));
     }
   }, [searchParams]);
@@ -213,6 +212,20 @@ const AppointmentForm = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const AppointmentForm = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-gray-600">Loading...</div>
+        </div>
+      }
+    >
+      <AppointmentFormContent />
+    </Suspense>
   );
 };
 
