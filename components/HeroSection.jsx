@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -34,18 +35,18 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 pt-4">
-              <a
+              <Link
                 href="/book-appointment"
                 className="inline-block bg-primary-500 text-white font-semibold text-lg px-8 py-4 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center"
               >
                 Book an Appointment
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#emergency"
                 className="inline-block bg-white border-2 border-slate-200 text-slate-700 font-semibold text-lg px-8 py-4 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-all duration-300 text-center"
               >
                 Check Appointment Status
-              </a>
+              </Link>
             </div>
           </div>
 

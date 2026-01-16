@@ -47,7 +47,7 @@ export function NavigationBar() {
         {/* Actions */}
         <div className="flex items-center gap-4">
           <Link
-            href="/#"
+            href="/book-appointment"
             className="inline-flex rounded-lg  bg-blue-500 px-4 py-2 text-lg font-semibold text-white hover:bg-blue-700 animate-pulse"
           >
             Book Appointment
