@@ -8,9 +8,9 @@ import Image from "next/image";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/#servicesSection" },
+  { name: "Reviews", href: "/#ReviewsSection" },
   { name: "About Us", href: "#aboutSection" },
-  { name: "FAQ", href: "/faq" },
-  { name: "Reviews", href: "/pricing" },
+  { name: "FAQ", href: "/#FaqSection" },
   { name: "Contact", href: "/#contactSection" },
 ];
 
@@ -21,15 +21,18 @@ export function NavigationBar() {
     <nav className="sticky top-0 z-50 max-w-full bg-white shadow">
       <div className="mx-auto flex max-w-full items-center justify-between px-6 py-4">
         {/* Brand */}
-        <Link href="/" className="text-3xl font-bold text-gray-900">
-          <Image
-            src="/logo.png"
-            alt="Clinic Logo"
-            width={80}
-            height={80}
-            className="h-12"
-          />
-        </Link>
+        <div className="flex items-center gap-2 text-xl font-bold">
+          <Link href="/" className="text-3xl font-bold text-gray-900">
+            <Image
+              src="/logo.png"
+              alt="Clinic Logo"
+              width={80}
+              height={80}
+              className="h-12"
+            />
+          </Link>
+          <h1>AABHA</h1>
+        </div>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8 text-xl font-medium text-gray-700">
