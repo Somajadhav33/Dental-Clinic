@@ -6,6 +6,9 @@ import React, { useState, useEffect, Suspense } from "react";
 const AppointmentFormContent = () => {
   const searchParams = useSearchParams();
 
+  const [categories, setCategories] = useState([]);
+  console.log(categories);
+
   const [formData, setFormData] = useState({
     patient_name: "",
     phone: "",
@@ -16,26 +19,37 @@ const AppointmentFormContent = () => {
     notes: "",
   });
 
+  // Fetch services
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const res = await fetch("/api/dental-services", { cache: "no-store" });
+      const data = await res.json();
+      setCategories(data.categories);
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Read service from URL
   useEffect(() => {
     const serviceFromUrl = searchParams.get("service");
     if (serviceFromUrl) {
-      const decodedService = decodeURIComponent(serviceFromUrl);
-      setFormData((prev) => ({ ...prev, service: decodedService }));
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData((prev) => ({
+        ...prev,
+        service: decodeURIComponent(serviceFromUrl),
+      }));
     }
   }, [searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Appointment Data:", formData);
-    alert("Appointment booked successfully!");
+    console.log("Appointment booked successfully!");
   };
 
   const today = new Date().toISOString().split("T")[0];
@@ -52,7 +66,7 @@ const AppointmentFormContent = () => {
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Patient Name */}
+              ={" "}
               <div>
                 <label
                   htmlFor="patient_name"
@@ -71,8 +85,7 @@ const AppointmentFormContent = () => {
                   placeholder="Abhishek Jadhav"
                 />
               </div>
-
-              {/* Phone */}
+              ={" "}
               <div>
                 <label
                   htmlFor="phone"
@@ -91,8 +104,7 @@ const AppointmentFormContent = () => {
                   placeholder="+91 00000 00000"
                 />
               </div>
-
-              {/* Email (Optional) */}
+              ={" "}
               <div>
                 <label
                   htmlFor="email"
@@ -110,8 +122,6 @@ const AppointmentFormContent = () => {
                   placeholder="patient@example.com"
                 />
               </div>
-
-              {/* Service */}
               <div>
                 <label
                   htmlFor="service"
@@ -125,22 +135,16 @@ const AppointmentFormContent = () => {
                   value={formData.service}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 >
                   <option value="">Select a service</option>
-                  <option value="General Checkup">General Checkup</option>
-                  <option value="Dental Cleaning (Scaling)">
-                    Dental Cleaning (Scaling)
-                  </option>
-                  <option value="Eye Exam">Eye Exam</option>
-                  <option value="Physiotherapy">Physiotherapy</option>
-                  <option value="Vaccination">Vaccination</option>
-                  <option value="Blood Test">Blood Test</option>
-                  <option value="Other">Other</option>
+                  {categories.map((service) => (
+                    <option key={service.id} value={service.name}>
+                      {service.name}
+                    </option>
+                  ))}
                 </select>
               </div>
-
-              {/* Appointment Date */}
               <div>
                 <label
                   htmlFor="appointment_date"
@@ -159,8 +163,6 @@ const AppointmentFormContent = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 />
               </div>
-
-              {/* Appointment Time */}
               <div>
                 <label
                   htmlFor="appointment_time"
@@ -180,7 +182,6 @@ const AppointmentFormContent = () => {
               </div>
             </div>
 
-            {/* Notes */}
             <div>
               <label
                 htmlFor="notes"
@@ -199,7 +200,6 @@ const AppointmentFormContent = () => {
               />
             </div>
 
-            {/* Submit Button */}
             <div className="flex justify-end pt-6">
               <button
                 type="submit"
