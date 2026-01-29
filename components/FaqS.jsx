@@ -1,7 +1,13 @@
 import React from "react";
-import { faqs } from "@/SampleData/Faq";
+import axios from "axios";
 
-export const FAQComponent = () => {
+const getFaqs = async () => {
+  const faq = await axios.get("http://localhost:3000/api/dental-faqs");
+  return faq;
+};
+
+export const FAQComponent = async () => {
+  const faq = await getFaqs();
   return (
     <div className="w-full mx-auto px-6 py-12">
       <div className="text-center mb-12">
@@ -14,7 +20,7 @@ export const FAQComponent = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {faqs.map((item) => (
+        {faq.data.map((item) => (
           <div
             key={item.id}
             className="bg-white rounded-lg shadow-md border border-gray-200 p-8 hover:shadow-lg transition-shadow"
