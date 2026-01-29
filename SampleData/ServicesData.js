@@ -5,7 +5,8 @@ const services = [
     category: "Preventive & Diagnostic Care",
     description:
       "Routine examination to assess overall oral health and detect issues early.",
-    image_url: "/images/services/dental-checkup.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612740/Dental_Check-up_iunqri.jpg",
     is_active: true,
     display_order: 1,
   },
@@ -15,7 +16,8 @@ const services = [
     category: "Preventive & Diagnostic Care",
     description:
       "Dental imaging to identify hidden problems beneath teeth and gums.",
-    image_url: "/images/services/xray.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612746/X-ray_zesuxl.jpg",
     is_active: false,
     display_order: 2,
   },
@@ -25,7 +27,8 @@ const services = [
     category: "Preventive & Diagnostic Care",
     description:
       "Removes plaque and tartar to keep gums healthy and prevent tooth decay.",
-    image_url: "/images/services/dental-cleaning.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612740/Dental_Cleaning_ew8qsk.jpg",
     is_active: true,
     display_order: 3,
   },
@@ -35,7 +38,8 @@ const services = [
     category: "Tooth Restoration",
     description:
       "Restores damaged back teeth with natural-looking composite material.",
-    image_url: "/images/services/composite-posterior.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612740/Composite_Restoration_Posterior_Teeth_qn1dd3.jpg",
     is_active: true,
     display_order: 4,
   },
@@ -44,7 +48,8 @@ const services = [
     name: "Composite Restoration (Anterior Teeth)",
     category: "Tooth Restoration",
     description: "Repairs front teeth while preserving a natural appearance.",
-    image_url: "/images/services/composite-anterior.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612739/Anterior_Composite_Restoration_ka2yjl.jpg",
     is_active: true,
     display_order: 5,
   },
@@ -54,7 +59,8 @@ const services = [
     category: "Tooth Extraction",
     description:
       "Removal of a tooth that cannot be saved due to damage or decay.",
-    image_url: "/images/services/simple-extraction.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612744/Simple_Extraction_gq6o7y.jpg",
     is_active: true,
     display_order: 6,
   },
@@ -63,7 +69,8 @@ const services = [
     name: "Surgical Extraction",
     category: "Tooth Extraction",
     description: "Advanced tooth removal for impacted or complicated cases.",
-    image_url: "/images/services/surgical-extraction.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612745/Surgical_Extraction_bskimr.jpg",
     is_active: true,
     display_order: 7,
   },
@@ -73,7 +80,8 @@ const services = [
     category: "Tooth Extraction",
     description:
       "Safe removal of problematic wisdom teeth to prevent pain and infection.",
-    image_url: "/images/services/wisdom-extraction.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612745/Wisdom_Tooth_Extraction_p9sbke.jpg",
     is_active: true,
     display_order: 8,
   },
@@ -83,72 +91,70 @@ const services = [
     category: "Root Canal Treatment",
     description:
       "Treats infected tooth pulp to relieve pain and save the tooth.",
-    image_url: "/images/services/root-canal.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612743/Root_Canal_Treatment_Wisdom_Tooth_b2s79b.jpg",
     is_active: false,
     display_order: 9,
   },
   {
     id: 10,
-    name: "Root Canal Treatment (Wisdom Tooth)",
-    category: "Root Canal Treatment",
-    description: "Specialized root canal procedure for infected wisdom teeth.",
-    image_url: "/images/services/rct-wisdom.jpg",
-    is_active: true,
-    display_order: 10,
-  },
-  {
-    id: 11,
     name: "Metal Crown",
     category: "Crowns & Caps",
     description: "Durable metal cap to protect and strengthen damaged teeth.",
-    image_url: "/images/services/metal-crown.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612742/Metal_Crown_mpnust.jpg",
     is_active: true,
     display_order: 11,
   },
   {
-    id: 12,
+    id: 11,
     name: "PFM Crown",
     category: "Crowns & Caps",
     description:
       "Porcelain-fused-to-metal crown combining strength and aesthetics.",
-    image_url: "/images/services/pfm-crown.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612742/PFM_Crown_iosgoo.jpg",
     is_active: true,
     display_order: 12,
   },
   {
-    id: 13,
+    id: 12,
     name: "Zirconia Crown",
     category: "Crowns & Caps",
     description:
       "High-strength, natural-looking crown for long-lasting results.",
-    image_url: "/images/services/zirconia-crown.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612746/Zirconia_Crown_kthwnl.jpg",
     is_active: true,
     display_order: 13,
   },
   {
-    id: 14,
+    id: 13,
     name: "Braces (Orthodontic Treatment)",
     category: "Orthodontics",
     description: "Aligns teeth gradually to improve bite and smile appearance.",
-    image_url: "/images/services/braces.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612739/Braces_rglbou.jpg",
     is_active: true,
     display_order: 14,
   },
   {
-    id: 15,
+    id: 14,
     name: "Teeth Whitening",
     category: "Cosmetic Dentistry",
     description: "Brightens teeth safely for a whiter, more confident smile.",
-    image_url: "/images/services/teeth-whitening.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612745/Teeth_Whitening_rhk20d.jpg",
     is_active: true,
     display_order: 15,
   },
   {
-    id: 16,
+    id: 15,
     name: "Denture (Partial / Complete)",
     category: "Dentures",
     description: "Custom-made dentures to restore function and appearance.",
-    image_url: "/images/services/denture.jpg",
+    image_url:
+      "https://res.cloudinary.com/dcpgnhaoa/image/upload/v1769612741/Denture_rtyq37.jpg",
     is_active: true,
     display_order: 16,
   },
