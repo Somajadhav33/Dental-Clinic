@@ -1,13 +1,38 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { Phone, Mail, Instagram, Send, Clock } from "lucide-react";
+import axios from "axios";
+
+// const { name, phone, email, message } = await request.json();
+
+const apiCall = async (data) => {
+  await axios.post("http://localhost:3000/api/contact-us", data);
+};
 
 const ContactUsForm = () => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [loding, setLoding] = useState(false);
+
   const handleSubmit = (e) => {
+    setLoding(true);
     e.preventDefault();
-    toast.success("Message sent successfully!");
-    e.target.reset();
+    const data = {
+      name,
+      phone,
+      email,
+      message,
+    };
+    apiCall(data);
+    toast.success("We got Your Message! Thank you ❤️");
+    setName("");
+    setEmail("");
+    setPhone("");
+    setMessage("");
+    setLoding(false);
   };
 
   return (
@@ -17,7 +42,7 @@ const ContactUsForm = () => {
     >
       <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="flex flex-col lg:flex-row gap-16 lg:gap-32">
-          {/* Left: Contact Info (Minimalist) */}
+          {/* Contact Info */}
           <div className="lg:w-1/3 space-y-12">
             <div className="space-y-4">
               <h2 className="text-4xl font-bold text-gray-900 font-serif">
@@ -99,7 +124,8 @@ const ContactUsForm = () => {
             </div>
           </div>
 
-          {/* Right: Form (Minimalist and Full Width) */}
+          {/* form */}
+
           <div className="lg:w-2/3">
             <form onSubmit={handleSubmit} className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -111,6 +137,8 @@ const ContactUsForm = () => {
                     Your Name
                   </label>
                   <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     id="name"
                     type="text"
                     required
@@ -126,6 +154,8 @@ const ContactUsForm = () => {
                     Phone Number
                   </label>
                   <input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     id="phone"
                     type="tel"
                     required
@@ -143,6 +173,8 @@ const ContactUsForm = () => {
                   Email Address
                 </label>
                 <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   id="email"
                   type="email"
                   required
@@ -159,6 +191,8 @@ const ContactUsForm = () => {
                   How can we help?
                 </label>
                 <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   id="message"
                   required
                   rows="4"
@@ -169,9 +203,10 @@ const ContactUsForm = () => {
 
               <button
                 type="submit"
+                disabled={loding}
                 className="group inline-flex items-center gap-3 bg-gray-900 text-white px-12 py-5 rounded-full font-bold hover:bg-black transition-all duration-300"
               >
-                Send Message
+                {loding ? "sending..." : " Send Message"}
                 <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </button>
             </form>
