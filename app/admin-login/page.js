@@ -65,6 +65,7 @@ export default function AdminLogin() {
                 setUsername(e.target.value);
                 setError("");
               }}
+              required
               type="text"
               placeholder="Enter Username"
               className="w-full mt-1 p-2 border rounded-md"
@@ -77,6 +78,7 @@ export default function AdminLogin() {
             </label>
             <input
               value={password}
+              required
               type="password"
               placeholder="••••••••"
               onChange={(e) => {
