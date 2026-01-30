@@ -4,7 +4,6 @@ import TopBar from "@/components/admin_models/TopBar";
 import React, { useState } from "react";
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState("");
   return (
     <>
       <TopBar />
