@@ -1,32 +1,25 @@
+"use client";
+
 import React, { useState } from "react";
 import { Trash2, Edit2, Save, X } from "lucide-react";
 import Image from "next/image";
 
-const initialServices = [
-  {
-    id: 1,
-    name: "Dental Check-up",
-    category: "Preventive & Diagnostic Care",
-    description:
-      "Routine examination to assess overall oral health and detect issues early.",
-    image_url: "/images/services/dental-checkup.jpg",
-    is_active: true,
-    display_order: 1,
-  },
-  {
-    id: 2,
-    name: "Teeth Whitening",
-    category: "Cosmetic Dentistry",
-    description: "Professional whitening treatment for a brighter smile.",
-    image_url: "/images/services/teeth-whitening.jpg",
-    is_active: true,
-    display_order: 2,
-  },
-];
+async function getServices() {
+  const res = await fetch("http://localhost:3000/api/dental-services", {
+    cache: "no-store",
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch services");
+
+  return res.json();
+}
+
+const initialServices = await getServices();
 
 const Services = () => {
-  const [services, setServices] = useState(initialServices);
+  const [services, setServices] = useState(initialServices.services);
   const [editingId, setEditingId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -42,27 +35,66 @@ const Services = () => {
     }));
   };
 
-  const handleAddService = (e) => {
+  const handleAddService = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.category || !formData.description) {
       alert("Please fill in all required fields");
       return;
     }
 
-    const newService = {
-      id: Date.now(),
-      ...formData,
-      is_active: true,
-      display_order: services.length + 1,
-    };
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/dental-services", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          category: formData.category,
+          description: formData.description,
+          image_url: formData.image_url,
+          is_active: true,
+          display_order: services.length + 1,
+        }),
+      });
 
-    setServices((prev) => [...prev, newService]);
-    setFormData({ name: "", category: "", description: "", image_url: "" });
+      if (!response.ok) {
+        throw new Error("Failed to add service");
+      }
+
+      const newService = await response.json();
+      setServices((prev) => [...prev, newService]);
+      setFormData({ name: "", category: "", description: "", image_url: "" });
+      alert("Service added successfully!");
+    } catch (error) {
+      console.error("Error adding service:", error);
+      alert("Failed to add service. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
-      setServices((prev) => prev.filter((service) => service.id !== id));
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/dental-services/${id}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete service");
+        }
+
+        setServices((prev) => prev.filter((service) => service.id !== id));
+        alert("Service deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting service:", error);
+        alert("Failed to delete service. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -76,15 +108,48 @@ const Services = () => {
     });
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    setServices((prev) =>
-      prev.map((service) =>
-        service.id === editingId ? { ...service, ...formData } : service
-      )
-    );
-    setEditingId(null);
-    setFormData({ name: "", category: "", description: "", image_url: "" });
+    if (!formData.name || !formData.category || !formData.description) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/dental-services/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          category: formData.category,
+          description: formData.description,
+          image_url: formData.image_url,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update service");
+      }
+
+      const updatedService = await response.json();
+      setServices((prev) =>
+        prev.map((service) =>
+          service.id === editingId ? updatedService : service,
+        ),
+      );
+
+      setEditingId(null);
+      setFormData({ name: "", category: "", description: "", image_url: "" });
+      alert("Service updated successfully!");
+    } catch (error) {
+      console.error("Error updating service:", error);
+      alert("Failed to update service. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -117,6 +182,7 @@ const Services = () => {
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -135,6 +201,7 @@ const Services = () => {
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -153,6 +220,7 @@ const Services = () => {
               rows="3"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -170,22 +238,29 @@ const Services = () => {
               value={formData.image_url}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoading}
             />
           </div>
 
           <div className="flex gap-2">
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              disabled={isLoading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save size={18} />
-              {editingId ? "Update Service" : "Add Service"}
+              {isLoading
+                ? "Saving..."
+                : editingId
+                  ? "Update Service"
+                  : "Add Service"}
             </button>
             {editingId && (
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors flex items-center gap-2"
+                disabled={isLoading}
+                className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={18} />
                 Cancel
@@ -199,54 +274,70 @@ const Services = () => {
         <h1 className="text-2xl font-bold mb-6 text-gray-800">
           Available Services
         </h1>
-        <ul className="space-y-4">
-          {services.map((service) => (
-            <li
-              key={service.id}
-              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    {service.name}
-                  </h2>
-                  <p className="text-sm text-blue-600 font-medium mb-2">
-                    {service.category}
-                  </p>
-                  <p className="text-gray-600 mb-3">{service.description}</p>
-                  {service.image_url && (
+        {services.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">
+            No services found. Add a new service to get started!
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((service) => (
+              <div
+                key={service.id}
+                className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col"
+              >
+                {service.image_url && (
+                  <div className="relative w-full h-48 bg-gray-200 overflow-hidden">
                     <Image
                       src={service.image_url}
                       alt={service.name}
-                      width={300}
-                      height={300}
-                      className="w-full max-w-md h-48 object-cover rounded-md"
+                      fill
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         e.target.style.display = "none";
                       }}
                     />
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(service)}
-                    className="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
-                    title="Edit service"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(service.id)}
-                    className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                    title="Delete service"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  </div>
+                )}
+
+                <div className="p-4 flex flex-col flex-1">
+                  <div className="mb-3">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-1">
+                      {service.name}
+                    </h2>
+                    <span className="inline-block px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-full">
+                      {service.category}
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-gray-600 mb-4 flex-1">
+                    {service.description}
+                  </p>
+
+                  <div className="flex gap-2 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => handleEdit(service)}
+                      disabled={isLoading}
+                      className="flex-1 px-3 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Edit service"
+                    >
+                      <Edit2 size={16} />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(service.id)}
+                      disabled={isLoading}
+                      className="flex-1 px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Delete service"
+                    >
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
