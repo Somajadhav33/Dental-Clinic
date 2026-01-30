@@ -2,7 +2,14 @@
 import { X } from "lucide-react";
 
 import React, { useState } from "react";
-import { CnMessages } from "@/SampleData/Faq";
+import axios from "axios";
+
+const getMessages = async () => {
+  const data = await axios.get("http://localhost:3000/api/contact-us");
+  return data.data;
+};
+
+const CnMessages = await getMessages();
 
 const ContactMessages = () => {
   const [messages, setMessages] = useState(CnMessages);
@@ -25,18 +32,20 @@ const ContactMessages = () => {
               <th className="px-4 py-3">Date</th>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Phone</th>
+              <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {messages.map((msg) => (
+            {messages.data.map((msg) => (
               <tr key={msg.id} className="border-b hover:bg-gray-50 transition">
                 <td className="px-4 py-3">{msg.created_at}</td>
                 <td className="px-4 py-3 font-medium text-gray-800">
                   {msg.name}
                 </td>
                 <td className="px-4 py-3">{msg.phone}</td>
+                <td className="px-4 py-3">{msg.email}</td>
                 <td className="px-4 py-3">
                   <button
                     onClick={() => openModal(msg)}
@@ -133,7 +142,7 @@ const ContactMessages = () => {
                   Message
                 </label>
                 <div className="bg-gray-50 p-4 rounded-lg mt-2">
-                  <p className="text-gray-900">{selectedMessage.message}</p>
+                  <p className="text-gray-900">{selectedMessage.messages}</p>
                 </div>
               </div>
             </div>
