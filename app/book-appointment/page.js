@@ -1,5 +1,6 @@
 "use client";
 
+import AppointMentSuccessCard from "@/components/AppointmentSuccessPage";
 import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect, Suspense } from "react";
 
@@ -7,7 +8,8 @@ const AppointmentFormContent = () => {
   const searchParams = useSearchParams();
 
   const [categories, setCategories] = useState([]);
-  console.log(categories);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [appointmentData, setAppointmentData] = useState(null);
 
   const [formData, setFormData] = useState({
     patient_name: "",
@@ -17,6 +19,7 @@ const AppointmentFormContent = () => {
     appointment_date: "",
     appointment_time: "",
     notes: "",
+    clinic: "",
   });
 
   // Fetch services
@@ -46,19 +49,71 @@ const AppointmentFormContent = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Appointment Data:", formData);
-    console.log("Appointment booked successfully!");
+
+    try {
+      const result = await fetch("/api/book-appointment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (result.ok) {
+        const data = await result.json();
+
+        // Store appointment data for success card
+        setAppointmentData({
+          id: data.appointment.appointment_id,
+          name: formData.patient_name,
+          clinic: formData.clinic,
+          date: formData.appointment_date,
+        });
+
+        // Show success card
+        setShowSuccess(true);
+
+        // Reset form
+        setFormData({
+          patient_name: "",
+          phone: "",
+          email: "",
+          service: "",
+          appointment_date: "",
+          appointment_time: "",
+          notes: "",
+          clinic: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+    }
   };
 
   const today = new Date().toISOString().split("T")[0];
+
+  // Show success card if appointment was successful
+  if (showSuccess && appointmentData) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <AppointMentSuccessCard
+          id={appointmentData.id}
+          name={appointmentData.name}
+          clinic={appointmentData.clinic}
+          date={appointmentData.date}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white shadow-xl rounded-lg overflow-hidden">
-          <div className="bg-blue-600 px-6 py-4">
+          <div className="bg-teal-600 px-6 py-4">
             <h2 className="text-2xl font-bold text-white">
               Book an Appointment
             </h2>
@@ -66,7 +121,6 @@ const AppointmentFormContent = () => {
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              ={" "}
               <div>
                 <label
                   htmlFor="patient_name"
@@ -81,11 +135,10 @@ const AppointmentFormContent = () => {
                   value={formData.patient_name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                   placeholder="Abhishek Jadhav"
                 />
               </div>
-              ={" "}
               <div>
                 <label
                   htmlFor="phone"
@@ -100,11 +153,10 @@ const AppointmentFormContent = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                   placeholder="+91 00000 00000"
                 />
               </div>
-              ={" "}
               <div>
                 <label
                   htmlFor="email"
@@ -118,7 +170,7 @@ const AppointmentFormContent = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                   placeholder="patient@example.com"
                 />
               </div>
@@ -135,7 +187,7 @@ const AppointmentFormContent = () => {
                   value={formData.service}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                 >
                   <option value="">Select a service</option>
                   {categories.map((service) => (
@@ -160,7 +212,7 @@ const AppointmentFormContent = () => {
                   onChange={handleChange}
                   required
                   min={today}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                 />
               </div>
               <div>
@@ -177,9 +229,30 @@ const AppointmentFormContent = () => {
                   value={formData.appointment_time}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                 />
               </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="clinic"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Service Center <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="clinic"
+                name="clinic"
+                value={formData.clinic}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
+              >
+                <option value="">Select Clinic</option>
+                <option value="Bedag">Bedag</option>
+                <option value="Miraj">Miraj</option>
+              </select>
             </div>
 
             <div>
@@ -195,7 +268,7 @@ const AppointmentFormContent = () => {
                 value={formData.notes}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition resize-none"
                 placeholder="Any special requests or medical information..."
               />
             </div>
@@ -203,7 +276,7 @@ const AppointmentFormContent = () => {
             <div className="flex justify-end pt-6">
               <button
                 type="submit"
-                className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition transform hover:scale-105"
+                className="px-8 py-3 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition transform hover:scale-105"
               >
                 Book Appointment
               </button>
