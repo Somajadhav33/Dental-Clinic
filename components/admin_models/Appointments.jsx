@@ -13,7 +13,10 @@ import {
   Bell,
   User,
   Stethoscope,
+  Hospital,
+  Mail,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const getAppointments = async () => {
   const response = await fetch("http://localhost:3000/api/book-appointment");
@@ -24,6 +27,7 @@ const getAppointments = async () => {
 const AppointmentsContent = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     getAppointments()
@@ -37,17 +41,49 @@ const AppointmentsContent = () => {
       });
   }, []);
 
-  const handleStatusChange = (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus) => {
+    setUpdating(true);
+    const result = await fetch("http://localhost:3000/api/book-appointment", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id,
+        newStatus,
+      }),
+    });
+
+    if (!result.ok) {
+      toast.error("Error while updatating status");
+    }
+
     setAppointments(
       appointments.map((apt) =>
         apt.id === id ? { ...apt, status: newStatus } : apt,
       ),
     );
+    toast.success(`Status Updated Succesfully to : ${newStatus}`);
+    setUpdating(false);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to cancel this appointment?")) {
+      const result = await fetch("http://localhost:3000/api/book-appointment", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      });
+
+      if (!result.ok) {
+        toast.error("Error while cancling status");
+      }
       setAppointments(appointments.filter((apt) => apt.id !== id));
+      toast.success("Appointment Deleted Successfully");
     }
   };
 
@@ -179,6 +215,32 @@ const AppointmentsContent = () => {
                       </p>
                     </div>
                   </div>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-cyan-50 p-2 rounded-lg">
+                      <Hospital className="w-4 h-4 text-cyan-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 uppercase tracking-wide">
+                        Clinic
+                      </p>
+                      <p className="font-medium text-slate-900">
+                        {appointment.at}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-cyan-50 p-2 rounded-lg">
+                      <Mail className="w-4 h-4 text-cyan-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 uppercase tracking-wide">
+                        E-mail
+                      </p>
+                      <p className="font-medium text-slate-900">
+                        {appointment.email}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bg-slate-50 rounded-lg p-4 mb-5">
@@ -239,24 +301,31 @@ const AppointmentsContent = () => {
                     onClick={() =>
                       handleStatusChange(appointment.id, "Confirmed")
                     }
+                    disabled={updating}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium shadow-sm"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    Confirm
+                    {updating ? "Confirming" : "Confirm"}
                   </button>
                   <button
                     onClick={() =>
                       handleStatusChange(appointment.id, "Completed")
                     }
+                    disabled={updating}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium shadow-sm"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    Complete
+                    {updating ? "Completing..." : "Complete"}
                   </button>
-                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium shadow-sm">
+
+                  <Link
+                    href={`/book-appointment?name=${appointment.name}&phone=${appointment.phone}&email=${appointment.email}&date=${appointment.preferred_date}&time=${appointment.preferred_time}&service=${appointment.service_name}&at=${appointment.at}`}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium shadow-sm"
+                  >
                     <RefreshCw className="w-4 h-4" />
                     Reschedule
-                  </button>
+                  </Link>
+
                   <button className="inline-flex items-center gap-2 px-4 py-2 bg-fuchsia-600 text-white rounded-lg hover:bg-fuchsia-700 transition-colors text-sm font-medium shadow-sm">
                     <Upload className="w-4 h-4" />
                     Upload Report
@@ -274,6 +343,10 @@ const AppointmentsContent = () => {
                   >
                     <XCircle className="w-4 h-4" />
                     Cancel
+                  </button>
+                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm">
+                    <Bell className="w-4 h-4 text-white-600" />
+                    Send Reminder Now
                   </button>
                 </div>
               </div>
