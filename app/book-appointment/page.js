@@ -6,20 +6,36 @@ import React, { useState, useEffect, Suspense } from "react";
 
 const AppointmentFormContent = () => {
   const searchParams = useSearchParams();
+  const params = useSearchParams();
+  const query = {
+    name: params.get("name"),
+    phone: params.get("phone"),
+    email: params.get("email"),
+    date: params.get("date"),
+    time: params.get("time"),
+    service: params.get("service"),
+    at: params.get("at"),
+    note: params.get("name") ? "Resheduled Your Appointment" : "",
+  };
+  const rawDate = query.date || "";
+
+  const appointment_date = rawDate
+    ? new Date(rawDate).toISOString().split("T")[0]
+    : "";
 
   const [categories, setCategories] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [appointmentData, setAppointmentData] = useState(null);
 
   const [formData, setFormData] = useState({
-    patient_name: "",
-    phone: "",
-    email: "",
-    service: "",
-    appointment_date: "",
-    appointment_time: "",
-    notes: "",
-    clinic: "",
+    patient_name: query.name || "",
+    phone: query.phone || "",
+    email: query.email || "",
+    service: query.service || "",
+    appointment_date: appointment_date || "",
+    appointment_time: query.time || "",
+    notes: query.note || "",
+    clinic: query.at || "",
   });
 
   // Fetch services
@@ -162,12 +178,13 @@ const AppointmentFormContent = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Email (Optional)
+                  Email
                 </label>
                 <input
                   type="email"
                   id="email"
                   name="email"
+                  required
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
