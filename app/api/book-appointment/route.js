@@ -1,5 +1,6 @@
 import db from "@/lib/db";
 import { NextResponse } from "next/server";
+import { success } from "zod";
 
 export async function GET(request) {
   const result = await db.query("SELECT * FROM appointments");
@@ -76,4 +77,35 @@ export async function POST(request) {
       { status: 500 },
     );
   }
+}
+
+export async function PUT(request) {
+  const { id, newStatus } = await request.json();
+  try {
+    const result = await db.query(
+      "UPDATE appointments SET status=$1 WHERE id = $2",
+      [newStatus, id],
+    );
+    if (result.rowCount === 0) {
+      throw new Error("Appointment Not Found!!");
+    }
+    return NextResponse.json({
+      status: "success",
+      message: "Status Changed Successfully",
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function DELETE(request) {
+  const { id } = await request.json();
+  const result = await db.query("DELETE FROM appointments where id=$1", [id]);
+  if (result.rowCount === 0) {
+    throw new Error("Error while deleting ");
+  }
+  return NextResponse.json({
+    status: "success",
+    message: "Appointment deleted successfully",
+  });
 }
