@@ -17,6 +17,7 @@ import {
   Mail,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const getAppointments = async () => {
   const response = await fetch("http://localhost:3000/api/book-appointment");
@@ -25,6 +26,7 @@ const getAppointments = async () => {
 };
 
 const AppointmentsContent = () => {
+  const router = useRouter();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -55,7 +57,7 @@ const AppointmentsContent = () => {
     });
 
     if (!result.ok) {
-      toast.error("Error while updatating status");
+      toast.error("Error while updating status");
     }
 
     setAppointments(
@@ -63,7 +65,7 @@ const AppointmentsContent = () => {
         apt.id === id ? { ...apt, status: newStatus } : apt,
       ),
     );
-    toast.success(`Status Updated Succesfully to : ${newStatus}`);
+    toast.success(`Status Updated Successfully to: ${newStatus}`);
     setUpdating(false);
   };
 
@@ -80,7 +82,7 @@ const AppointmentsContent = () => {
       });
 
       if (!result.ok) {
-        toast.error("Error while cancling status");
+        toast.error("Error while canceling appointment");
       }
       setAppointments(appointments.filter((apt) => apt.id !== id));
       toast.success("Appointment Deleted Successfully");
@@ -89,12 +91,70 @@ const AppointmentsContent = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("en-IN", {
       weekday: "short",
+      day: "2-digit",
       month: "short",
-      day: "numeric",
       year: "numeric",
     });
+  };
+
+  const formatTime = (timeString) => {
+    // If time is already in HH:MM format, return as is
+    if (timeString && timeString.includes(":")) {
+      return timeString;
+    }
+    // Otherwise format it
+    const time = new Date(`2000-01-01T${timeString}`);
+    return time.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  const sendReminder = async (appId, name, date, time, email, at) => {
+    try {
+      const response = await fetch("/api/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email,
+          subject: "Appointment Reminder",
+          text: "You have a dental appointment tomorrow.",
+          html: `
+          <div style="font-family: Arial, sans-serif; padding: 16px;">
+            <h2 style="margin-bottom: 8px;">Aabha Dental Clinic</h2>
+            <p>Hello <b>${name}</b>,</p>
+            <p>This is a reminder for your dental appointment:</p>
+            <p>
+              <b>Date:</b> ${formatDate(date)}<br/>
+              <b>Time:</b> ${time}<br/>
+              <b>At:</b> AABHA DENTAL CLINIC, ${at}
+            </p>
+            <p style="margin-top: 12px;">
+              Please arrive 10 minutes early.
+            </p>
+            <p style="font-size: 12px; color: #666;">
+              Appointment ID: ${appId}
+            </p>
+            <p>Save this appointment ID for accessing your reports later.</p>
+          </div>
+        `,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message);
+      }
+
+      const data = await response.json();
+      toast.success("Reminder sent successfully");
+    } catch (error) {
+      console.error("Reminder error:", error);
+      toast.error("Failed to send reminder. Try again.");
+    }
   };
 
   const getStatusStyle = (status) => {
@@ -110,6 +170,106 @@ const AppointmentsContent = () => {
       default:
         return "bg-slate-50 text-slate-700 border-slate-200";
     }
+  };
+
+  // Render buttons based on appointment status
+  const renderActionButtons = (appointment) => {
+    const status = appointment.status;
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {/* Confirm Button - Show only for Pending */}
+        {status === "Pending" && (
+          <button
+            onClick={() => handleStatusChange(appointment.id, "Confirmed")}
+            disabled={updating}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            {updating ? "Confirming..." : "Confirm"}
+          </button>
+        )}
+
+        {/* Complete Button - Show only for Confirmed */}
+        {status === "Confirmed" && (
+          <button
+            onClick={() => handleStatusChange(appointment.id, "Completed")}
+            disabled={updating}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            {updating ? "Completing..." : "Complete"}
+          </button>
+        )}
+
+        {/* Reschedule Button - Show for Pending, Confirmed */}
+        {(status === "Pending" || status === "Confirmed") && (
+          <Link
+            href={`/book-appointment?name=${appointment.name}&phone=${appointment.phone}&email=${appointment.email}&date=${appointment.preferred_date}&time=${appointment.preferred_time}&service=${appointment.service_name}&at=${appointment.at}`}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium shadow-sm"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Reschedule
+          </Link>
+        )}
+
+        {/* Upload Report Button - Show only for Completed */}
+        {status === "Completed" && (
+          <button
+            onClick={() => {
+              router.push(`/upload-report?id=${appointment.appointment_id}`);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-fuchsia-600 text-white rounded-lg hover:bg-fuchsia-700 transition-colors text-sm font-medium shadow-sm"
+          >
+            <Upload className="w-4 h-4" />
+            Upload Report
+          </button>
+        )}
+
+        {/* Call Button - Show for all except Cancelled */}
+        {status !== "Cancelled" && (
+          <Link
+            href={`tel:${appointment.phone}`}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium shadow-sm"
+          >
+            <Phone className="w-4 h-4" />
+            Call
+          </Link>
+        )}
+
+        {/* Cancel Button - Show for Pending and Confirmed */}
+        {(status === "Pending" || status === "Confirmed") && (
+          <button
+            onClick={() => handleStatusChange(appointment.id, "Cancelled")}
+            disabled={updating}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
+          >
+            <XCircle className="w-4 h-4" />
+            {updating ? "Cancelling..." : "Cancel"}
+          </button>
+        )}
+
+        {/* Send Reminder Button - Show for Pending and Confirmed */}
+        {(status === "Pending" || status === "Confirmed") && (
+          <button
+            onClick={() =>
+              sendReminder(
+                appointment.appointment_id,
+                appointment.name,
+                appointment.preferred_date,
+                appointment.preferred_time,
+                appointment.email,
+                appointment.at,
+              )
+            }
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
+          >
+            <Bell className="w-4 h-4" />
+            Send Reminder
+          </button>
+        )}
+      </div>
+    );
   };
 
   if (loading) {
@@ -159,16 +319,18 @@ const AppointmentsContent = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="font-semibold mt-3">
-                    Appointment id : {appointment.appointment_id}
-                  </p>
-                  <span
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusStyle(
-                      appointment.status,
-                    )}`}
-                  >
-                    {appointment.status}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <span
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusStyle(
+                        appointment.status,
+                      )}`}
+                    >
+                      {appointment.status}
+                    </span>
+                    <p className="text-xs text-slate-500">
+                      ID: {appointment.appointment_id}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -197,7 +359,7 @@ const AppointmentsContent = () => {
                         Date
                       </p>
                       <p className="font-medium text-slate-900">
-                        {appointment.preferred_date}
+                        {formatDate(appointment.preferred_date)}
                       </p>
                     </div>
                   </div>
@@ -215,9 +377,10 @@ const AppointmentsContent = () => {
                       </p>
                     </div>
                   </div>
+
                   <div className="flex items-center gap-3">
-                    <div className="bg-cyan-50 p-2 rounded-lg">
-                      <Hospital className="w-4 h-4 text-cyan-600" />
+                    <div className="bg-orange-50 p-2 rounded-lg">
+                      <Hospital className="w-4 h-4 text-orange-600" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 uppercase tracking-wide">
@@ -228,15 +391,16 @@ const AppointmentsContent = () => {
                       </p>
                     </div>
                   </div>
+
                   <div className="flex items-center gap-3">
-                    <div className="bg-cyan-50 p-2 rounded-lg">
-                      <Mail className="w-4 h-4 text-cyan-600" />
+                    <div className="bg-pink-50 p-2 rounded-lg">
+                      <Mail className="w-4 h-4 text-pink-600" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 uppercase tracking-wide">
-                        E-mail
+                        Email
                       </p>
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-slate-900 text-sm">
                         {appointment.email}
                       </p>
                     </div>
@@ -296,59 +460,8 @@ const AppointmentsContent = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() =>
-                      handleStatusChange(appointment.id, "Confirmed")
-                    }
-                    disabled={updating}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    {updating ? "Confirming" : "Confirm"}
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleStatusChange(appointment.id, "Completed")
-                    }
-                    disabled={updating}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    {updating ? "Completing..." : "Complete"}
-                  </button>
-
-                  <Link
-                    href={`/book-appointment?name=${appointment.name}&phone=${appointment.phone}&email=${appointment.email}&date=${appointment.preferred_date}&time=${appointment.preferred_time}&service=${appointment.service_name}&at=${appointment.at}`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Reschedule
-                  </Link>
-
-                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-fuchsia-600 text-white rounded-lg hover:bg-fuchsia-700 transition-colors text-sm font-medium shadow-sm">
-                    <Upload className="w-4 h-4" />
-                    Upload Report
-                  </button>
-                  <Link
-                    href={`tel:${appointment.phone}`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Call
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(appointment.id)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    Cancel
-                  </button>
-                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm">
-                    <Bell className="w-4 h-4 text-white-600" />
-                    Send Reminder Now
-                  </button>
-                </div>
+                {/* Render buttons based on status */}
+                {renderActionButtons(appointment)}
               </div>
             </div>
           ))}
