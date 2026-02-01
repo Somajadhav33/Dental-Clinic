@@ -43,7 +43,8 @@ const AppointmentFormContent = () => {
     const fetchCategories = async () => {
       const res = await fetch("/api/dental-services", { cache: "no-store" });
       const data = await res.json();
-      setCategories(data.categories);
+      console.log(data);
+      setCategories(data.services);
     };
 
     fetchCategories();
@@ -250,7 +251,6 @@ const AppointmentFormContent = () => {
                 />
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="clinic"
@@ -271,7 +271,6 @@ const AppointmentFormContent = () => {
                 <option value="Miraj">Miraj</option>
               </select>
             </div>
-
             <div>
               <label
                 htmlFor="notes"
@@ -288,6 +287,49 @@ const AppointmentFormContent = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition resize-none"
                 placeholder="Any special requests or medical information..."
               />
+            </div>
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="text-sm font-semibold text-blue-800 mb-2">
+                Important Notes & Clinic Timings
+              </h3>
+              <ul className="list-disc list-inside space-y-1 text-sm text-blue-700">
+                <li>Clinic remains closed every Sunday.</li>
+                <li>
+                  Miraj Clinic Timings: <strong>9:00 AM – 2:00 PM</strong>{" "}
+                  (Monday to Saturday)
+                </li>
+                <li>
+                  Bedag Clinic Timings: <strong>4:00 PM – 9:00 PM</strong>{" "}
+                  (Monday to Saturday)
+                </li>
+                <li>Appointment fees must be paid directly at the clinic.</li>
+                <li>Please arrive 10 minutes before your scheduled time.</li>
+                <li>Carry a valid ID and previous medical reports (if any).</li>
+                <li>
+                  Cancellations should be made at least 24 hours in advance.
+                </li>
+                <li>
+                  An automatic email reminder will be sent 2 hours before your
+                  appointment.
+                </li>
+              </ul>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <input
+                id="confirmation"
+                name="confirmation"
+                type="checkbox"
+                required
+                className="mt-1"
+              />
+              <label htmlFor="confirmation" className="text-sm text-gray-700">
+                I agree to the{" "}
+                <span className="font-medium text-teal-600">
+                  terms and conditions
+                </span>{" "}
+                and confirm that the information provided is accurate.
+              </label>
             </div>
 
             <div className="flex justify-end pt-6">
