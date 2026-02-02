@@ -1,6 +1,7 @@
 "use client";
 
 import AppointMentSuccessCard from "@/components/AppointmentSuccessPage";
+import { BOOKING_CONFIRMATION_EMAIL } from "@/model/emailTemplates";
 import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect, Suspense } from "react";
 
@@ -26,6 +27,7 @@ const AppointmentFormContent = () => {
   const [categories, setCategories] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [appointmentData, setAppointmentData] = useState(null);
+  const [isLoading, setLoding] = useState(false);
 
   const [formData, setFormData] = useState({
     patient_name: query.name || "",
@@ -43,7 +45,6 @@ const AppointmentFormContent = () => {
     const fetchCategories = async () => {
       const res = await fetch("/api/dental-services", { cache: "no-store" });
       const data = await res.json();
-      console.log(data);
       setCategories(data.services);
     };
 
@@ -54,7 +55,6 @@ const AppointmentFormContent = () => {
   useEffect(() => {
     const serviceFromUrl = searchParams.get("service");
     if (serviceFromUrl) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData((prev) => ({
         ...prev,
         service: decodeURIComponent(serviceFromUrl),
@@ -67,8 +67,46 @@ const AppointmentFormContent = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const sendConfirmationEmail = async (appointment) => {
+    if (!appointment?.email) {
+      console.warn("No email found for appointment → skipping email");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: appointment.email,
+          subject: "Your Appointment is Confirmed – Aabha Dental Clinic",
+          text: `Dear ${appointment.patient_name || "Patient"}`,
+          html: BOOKING_CONFIRMATION_EMAIL({
+            patientName: appointment.name || "Patient",
+            appointmentId: appointment.appointment_id,
+            date: appointment.preferred_date,
+            time: appointment.preferred_time,
+            service: appointment.service_name || "General Dental",
+            clinic: appointment.at || "Aabha Dental Clinic",
+          }),
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || `HTTP ${response.status}`);
+      }
+
+      console.log("Confirmation email sent successfully");
+    } catch (err) {
+      console.error("Failed to send confirmation email:", err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setLoding(true);
 
     try {
       const result = await fetch("/api/book-appointment", {
@@ -82,7 +120,6 @@ const AppointmentFormContent = () => {
       if (result.ok) {
         const data = await result.json();
 
-        // Store appointment data for success card
         setAppointmentData({
           id: data.appointment.appointment_id,
           name: formData.patient_name,
@@ -90,10 +127,10 @@ const AppointmentFormContent = () => {
           date: formData.appointment_date,
         });
 
-        // Show success card
-        setShowSuccess(true);
+        const appointment = data.appointment;
+        await sendConfirmationEmail(appointment);
 
-        // Reset form
+        setShowSuccess(true);
         setFormData({
           patient_name: "",
           phone: "",
@@ -105,14 +142,15 @@ const AppointmentFormContent = () => {
           clinic: "",
         });
       }
+      setLoding(false);
     } catch (error) {
       console.error("Error booking appointment:", error);
+      setLoding(false);
     }
   };
 
   const today = new Date().toISOString().split("T")[0];
 
-  // Show success card if appointment was successful
   if (showSuccess && appointmentData) {
     return (
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
@@ -337,7 +375,7 @@ const AppointmentFormContent = () => {
                 type="submit"
                 className="px-8 py-3 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition transform hover:scale-105"
               >
-                Book Appointment
+                {isLoading ? "Booking Appointment..." : "Book Appointment"}
               </button>
             </div>
           </form>
