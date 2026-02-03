@@ -42,7 +42,7 @@ export function NavigationBar() {
             <Link
               key={link.name}
               href={link.href}
-              className="transition hover:text-blue-600"
+              className="transition hover:text-teal-600"
             >
               {link.name}
             </Link>
@@ -52,7 +52,7 @@ export function NavigationBar() {
         <div className="flex items-center gap-4">
           <Link
             href="/book-appointment"
-            className="inline-flex rounded-lg  bg-blue-500 px-4 py-2 text-lg font-semibold text-white hover:bg-blue-700 animate-pulse"
+            className="inline-flex rounded-lg  bg-teal-500 px-4 py-2 text-lg font-semibold text-white hover:bg-teal-700 animate-pulse"
           >
             Book Appointment
           </Link>
