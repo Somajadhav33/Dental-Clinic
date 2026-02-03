@@ -12,6 +12,7 @@ const navLinks = [
   { name: "About Us", href: "#aboutSection" },
   { name: "FAQ", href: "/#FaqSection" },
   { name: "Contact", href: "/#contactSection" },
+  { name: "Check Report", href: "/appointment-status" },
 ];
 
 export function NavigationBar() {
@@ -20,9 +21,11 @@ export function NavigationBar() {
   return (
     <nav className="sticky top-0 z-50 max-w-full bg-white shadow">
       <div className="mx-auto flex max-w-full items-center justify-between px-6 py-4">
-        {/* Brand */}
-        <div className="flex items-center gap-2 text-xl font-bold">
-          <Link href="/" className="text-3xl font-bold text-gray-900">
+        <div className="flex items-center justify-center gap-2 text-xl font-bold">
+          <Link
+            href="/"
+            className="flex justify-center align-middle text-xl font-bold text-gray-900"
+          >
             <Image
               src="/logo.png"
               alt="Clinic Logo"
@@ -30,11 +33,10 @@ export function NavigationBar() {
               height={80}
               className="h-12"
             />
+            <p className="font-semibold mt-2.5 ml-2">AABHA</p>
           </Link>
-          <h1>AABHA</h1>
         </div>
 
-        {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8 text-xl font-medium text-gray-700">
           {navLinks.map((link) => (
             <Link
@@ -47,7 +49,6 @@ export function NavigationBar() {
           ))}
         </div>
 
-        {/* Actions */}
         <div className="flex items-center gap-4">
           <Link
             href="/book-appointment"
