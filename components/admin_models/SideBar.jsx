@@ -8,7 +8,7 @@ const SideBar = ({ activeTab, setActiveTab }) => {
       <nav className="flex flex-col gap-2">
         <button
           onClick={() => setActiveTab("appointments")}
-          className={`px-4 py-3 rounded-lg text-left transition-colors duration-200 font-medium ${
+          className={`px-4 py-3 rounded-lg cursor-pointer text-left transition-colors duration-200 font-medium ${
             activeTab === "appointments"
               ? "bg-blue-50 text-blue-600"
               : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
@@ -18,7 +18,7 @@ const SideBar = ({ activeTab, setActiveTab }) => {
         </button>
         <button
           onClick={() => setActiveTab("services")}
-          className={`px-4 py-3 rounded-lg text-left transition-colors duration-200 font-medium ${
+          className={`px-4 py-3 rounded-lg text-left cursor-pointer transition-colors duration-200 font-medium ${
             activeTab === "services"
               ? "bg-blue-50 text-blue-600"
               : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
@@ -28,7 +28,7 @@ const SideBar = ({ activeTab, setActiveTab }) => {
         </button>
         <button
           onClick={() => setActiveTab("messages")}
-          className={`px-4 py-3 rounded-lg text-left transition-colors duration-200 font-medium ${
+          className={`px-4 py-3 rounded-lg text-left cursor-pointer transition-colors duration-200 font-medium ${
             activeTab === "messages"
               ? "bg-blue-50 text-blue-600"
               : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
@@ -38,7 +38,7 @@ const SideBar = ({ activeTab, setActiveTab }) => {
         </button>
         <button
           onClick={() => setActiveTab("settings")}
-          className={`px-4 py-3 rounded-lg text-left transition-colors duration-200 font-medium ${
+          className={`px-4 py-3 rounded-lg text-left cursor-pointer transition-colors duration-200 font-medium ${
             activeTab === "settings"
               ? "bg-blue-50 text-blue-600"
               : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
