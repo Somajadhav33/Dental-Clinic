@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MapPin, Clock, User, Phone, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 const AboutPage = () => {
   return (
@@ -51,7 +52,7 @@ const AboutPage = () => {
                 </div>
                 <div className="relative h-48 rounded-2xl overflow-hidden shadow-xl transition-transform hover:scale-105 duration-500">
                   <Image
-                    src="/g5.jpg"
+                    src="/g2.jpg"
                     alt="Dental Equipment"
                     fill
                     className="object-cover"
@@ -61,7 +62,7 @@ const AboutPage = () => {
               <div className="space-y-4">
                 <div className="relative h-48 rounded-2xl overflow-hidden shadow-xl transition-transform hover:scale-105 duration-500">
                   <Image
-                    src="/g1.jpg"
+                    src="/g7.jpg"
                     alt="Consultation Area"
                     fill
                     className="object-cover"
@@ -69,7 +70,7 @@ const AboutPage = () => {
                 </div>
                 <div className="relative h-64 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500">
                   <Image
-                    src="/g5.jpg"
+                    src="/g4.jpg"
                     alt="Smiles Gallery"
                     fill
                     className="object-cover"
@@ -77,14 +78,13 @@ const AboutPage = () => {
                 </div>
               </div>
             </div>
-            {/* Decorative background element */}
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-cyan-100 rounded-full blur-3xl opacity-50 -z-10"></div>
             <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50 -z-10"></div>
           </div>
         </div>
       </section>
 
-      {/* Clinics Locations */}
+      {/* Clinics */}
       <section className="space-y-12">
         <div className="text-center space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold text-blue-900 font-serif">
@@ -94,11 +94,10 @@ const AboutPage = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-10">
-          {/* Clinic 1 - Miraj */}
           <div className="group bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
             <div className="relative h-64 w-full rounded-2xl overflow-hidden mb-8">
               <Image
-                src="/g5.jpg"
+                src="/clinic.png"
                 alt="Miraj Clinic"
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -118,7 +117,7 @@ const AboutPage = () => {
                   <p>
                     <span className="font-semibold text-gray-900">
                       Dentist:
-                    </span>{" "}
+                    </span>
                     Dr. Bhushan Dadaso Tale
                   </p>
                 </div>
@@ -150,11 +149,10 @@ const AboutPage = () => {
             </div>
           </div>
 
-          {/* Clinic 2 - Bedag */}
           <div className="group bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
             <div className="relative h-64 w-full rounded-2xl overflow-hidden mb-8">
               <Image
-                src="/g1.jpg"
+                src="/clinic.png"
                 alt="Bedag Clinic"
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -174,7 +172,7 @@ const AboutPage = () => {
                   <p>
                     <span className="font-semibold text-gray-900">
                       Dentist:
-                    </span>{" "}
+                    </span>
                     Dr. Bhushan Dadaso Tale
                   </p>
                 </div>
@@ -217,10 +215,8 @@ const AboutPage = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-12">
-          {/* Profile card */}
           <div className="w-full max-w-sm group shadow p-4 border rounded-sm hover:shadow-2xl transition-all duration-300">
             <div className="relative mb-6">
-              {/* Profile Image with decorative background */}
               <div className="relative h-100 w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
                 <Image
                   src="/g5.jpg"
@@ -239,20 +235,26 @@ const AboutPage = () => {
                 Bharati Vidyapeeth Dental College and Hospital
               </div>
               <div className="flex justify-center gap-4 pt-4">
-                <button className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors">
+                <a
+                  href="tel:12345678901"
+                  className="p-2 rounded-full bg-blue-50 text-teal-600 hover:bg-blue-600 hover:text-white transition-colors"
+                >
                   <Phone className="w-5 h-5" />
-                </button>
+                </a>
+
                 <div className="w-px h-8 bg-gray-200 self-center"></div>
-                <button className="px-6 py-2 bg-blue-900 text-white rounded-full font-semibold hover:bg-blue-800 transition-colors shadow-md">
+                <Link
+                  href="/book-appointment"
+                  className="px-6 py-2 bg-teal-900 text-white rounded-full font-semibold hover:bg-teal-800 transition-colors shadow-md"
+                >
                   Book Appointment
-                </button>
+                </Link>
               </div>
             </div>
           </div>
 
           <div className="w-full max-w-sm group shadow p-4 border rounded-sm hover:shadow-2xl transition-all duration-300">
             <div className="relative mb-6">
-              {/* Profile Image with decorative background */}
               <div className="relative h-100 w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
                 <Image
                   src="/g5.jpg"
@@ -271,13 +273,19 @@ const AboutPage = () => {
                 Bharati Vidyapeeth Dental College and Hospital
               </div>
               <div className="flex justify-center gap-4 pt-4">
-                <button className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors">
+                <a
+                  href="tel:12345678901"
+                  className="p-2 rounded-full bg-blue-50 text-teal-600 hover:bg-blue-600 hover:text-white transition-colors"
+                >
                   <Phone className="w-5 h-5" />
-                </button>
+                </a>
                 <div className="w-px h-8 bg-gray-200 self-center"></div>
-                <button className="px-6 py-2 bg-blue-900 text-white rounded-full font-semibold hover:bg-blue-800 transition-colors shadow-md">
+                <Link
+                  href="/book-appointment"
+                  className="px-6 py-2 bg-teal-900 text-white rounded-full font-semibold hover:bg-teal-800 transition-colors shadow-md"
+                >
                   Book Appointment
-                </button>
+                </Link>
               </div>
             </div>
           </div>
