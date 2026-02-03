@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import { Phone, Mail, Instagram, Send, Clock } from "lucide-react";
 import axios from "axios";
-
-// const { name, phone, email, message } = await request.json();
+import { CONTACT_AUTOREPLY_EMAIL } from "@/model/emailTemplates";
 
 const apiCall = async (data) => {
   await axios.post("http://localhost:3000/api/contact-us", data);
@@ -16,6 +15,28 @@ const ContactUsForm = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loding, setLoding] = useState(false);
+  // ;
+
+  const sendEmail = async (name, email) => {
+    try {
+      const response = await fetch("/api/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email,
+          subject: "We’ve Got Your Message – Aabha Dental Clinic",
+          text: `Dear ${name || "Patient"}`,
+          html: CONTACT_AUTOREPLY_EMAIL({ name }),
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to send confirmation email");
+      }
+    } catch (error) {
+      console.error("Error sending confirmation email:", error);
+    }
+  };
 
   const handleSubmit = (e) => {
     setLoding(true);
@@ -27,7 +48,8 @@ const ContactUsForm = () => {
       message,
     };
     apiCall(data);
-    toast.success("We got Your Message! Thank you ❤️");
+    sendEmail(data.name, data.email);
+    toast.success(`${data.name} We got Your Message! Thank you ❤️`);
     setName("");
     setEmail("");
     setPhone("");
@@ -42,7 +64,6 @@ const ContactUsForm = () => {
     >
       <div className="w-full px-6 md:px-12 lg:px-24">
         <div className="flex flex-col lg:flex-row gap-16 lg:gap-32">
-          {/* Contact Info */}
           <div className="lg:w-1/3 space-y-12">
             <div className="space-y-4">
               <h2 className="text-4xl font-bold text-gray-900 font-serif">
@@ -80,7 +101,7 @@ const ContactUsForm = () => {
                     href="mailto:soma3344@gmail.com"
                     className="text-xl font-medium text-gray-900 hover:underline"
                   >
-                    soma3344@gmail.com
+                    doctor@gmail.com
                   </a>
                 </div>
               </div>
@@ -204,7 +225,7 @@ const ContactUsForm = () => {
               <button
                 type="submit"
                 disabled={loding}
-                className="group inline-flex items-center gap-3 bg-gray-900 text-white px-12 py-5 rounded-full font-bold hover:bg-black transition-all duration-300"
+                className="group inline-flex items-center gap-3 bg-teal-900 cursor-pointer text-white px-12 py-5 rounded-full font-bold hover:bg-teal transition-all duration-300"
               >
                 {loding ? "sending..." : " Send Message"}
                 <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
