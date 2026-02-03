@@ -5,18 +5,17 @@ import Image from "next/image";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loader, setLoader] = useState(false);
-  const [remember, setRemember] = useState(
-    localStorage.getItem("remember") === "true",
-  );
 
   const router = useRouter();
-  localStorage;
+  const jwtToken = Cookies.get("jwtToken");
+  console.log(jwtToken);
 
   const loginSub = async (e) => {
     e.preventDefault();
@@ -94,25 +93,6 @@ export default function AdminLogin() {
           ) : (
             ""
           )}
-
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => {
-                  const val = e.target.checked;
-                  setRemember(val);
-                  localStorage.setItem("remember", val);
-                }}
-              />
-              Remember me
-            </label>
-
-            <a href="#" className="text-blue-600">
-              Forgot?
-            </a>
-          </div>
 
           <button
             type="submit"
