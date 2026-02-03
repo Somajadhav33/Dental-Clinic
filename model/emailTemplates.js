@@ -187,7 +187,7 @@ export const REPORT_READY_EMAIL = ({ patientName, appointmentId, reportUrl }) =>
       </p>
       
       <p style="color:#333333;font-size:15px;line-height:1.6;margin:0 0 30px;">
-        Your dental report has been uploaded and is now available for download.
+        Your dental report has been uploaded and is now available for view and download.
       </p>
 
       <table width="100%" cellpadding="20" cellspacing="0" style="background:#f5f5f5;border:1px solid #dddddd;margin-bottom:30px;text-align:center;">
@@ -219,8 +219,10 @@ export const APPOINTMENT_RESCHEDULED_EMAIL = ({
   appointmentId,
   oldDate,
   oldTime,
+  oldService,
   newDate,
   newTime,
+  newService,
   clinic,
 }) =>
   emailWrapper(`
@@ -245,6 +247,7 @@ export const APPOINTMENT_RESCHEDULED_EMAIL = ({
                   <p style="color:#999999;font-size:12px;margin:0 0 10px;">Previous Appointment</p>
                   <p style="color:#666666;font-size:16px;margin:0;text-decoration:line-through;">${oldDate}</p>
                   <p style="color:#666666;font-size:14px;margin:5px 0 0;text-decoration:line-through;">${oldTime}</p>
+                  <p style="color:#666666;font-size:10px;margin:5px 0 0;text-decoration:line-through;">(${oldService})</p>
                 </td>
               </tr>
             </table>
@@ -259,6 +262,7 @@ export const APPOINTMENT_RESCHEDULED_EMAIL = ({
                   <p style="color:#666666;font-size:12px;margin:0 0 10px;">New Appointment</p>
                   <p style="color:#2c5282;font-size:18px;margin:0;font-weight:bold;">${newDate}</p>
                   <p style="color:#2c5282;font-size:16px;margin:5px 0 0;font-weight:bold;">${newTime}</p>
+                  <p style="color:#666666;font-size:10px;margin:5px 0 0;text-decoration:line-through;">(${newService})</p>
                 </td>
               </tr>
             </table>
@@ -425,7 +429,8 @@ export const CONTACT_AUTOREPLY_EMAIL = ({ name }) =>
       </table>
 
       <p style="color:#666666;font-size:14px;line-height:1.6;margin:0;text-align:center;">
-        Working Hours: Monday to Saturday, 9:00 AM - 8:00 PM
+        Working Hours: Monday to Saturday(Miraj), 9:00 AM - 2:00 PM<br>
+        Working Hours: Monday to Saturday(Bedag), 2:00 PM - 9:00 PM<br>
       </p>
     </td>
   </tr>
