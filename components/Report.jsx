@@ -49,7 +49,7 @@ const Report = ({ id }) => {
 
   if (error || !reportData) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
+      <div className="min-h-100 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-gray-100 p-4 rounded-full">

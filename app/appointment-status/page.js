@@ -22,7 +22,6 @@ const GetReportContainer = () => {
     setIsLoading(true);
 
     try {
-      // Check if report exists
       const response = await fetch(`/api/book-appointment/${appointmentId}`);
 
       if (!response.ok) {
@@ -53,11 +52,10 @@ const GetReportContainer = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-blue-100 p-4 rounded-full">
-              <FileText size={40} className="text-blue-600" />
+            <div className="bg-teal-100 p-4 rounded-full">
+              <FileText size={40} className="text-teal-600" />
             </div>
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
@@ -68,7 +66,6 @@ const GetReportContainer = () => {
           </p>
         </div>
 
-        {/* Input Container */}
         <div className="space-y-4">
           <div>
             <label
@@ -89,18 +86,16 @@ const GetReportContainer = () => {
             />
           </div>
 
-          {/* Get Report Button */}
           <button
             onClick={handleGetReport}
             disabled={isLoading}
-            className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full cursor-pointer px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Search size={20} />
             {isLoading ? "Loading..." : "Get Report"}
           </button>
         </div>
 
-        {/* Footer Note */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
             Your appointment ID was sent to you via SMS/Email

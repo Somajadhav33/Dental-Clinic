@@ -22,87 +22,9 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Report from "@/components/Report";
 
-// Dummy Data - No API needed
-const DUMMY_REPORT = {
-  appointment: {
-    id: "APT-2024-001",
-    date: "15 January 2025",
-    time: "10:30 AM",
-    status: "Completed",
-    clinic: "Bedag Dental Clinic",
-    doctor: "Dr. Rajesh Kumar",
-  },
-  patient: {
-    name: "Priya Sharma",
-    age: 32,
-    phone: "+91 98765 43210",
-    email: "priya.sharma@example.com",
-  },
-  diagnosis: "Dental caries in upper right first molar with mild inflammation",
-  observations:
-    "Patient reports sensitivity to cold beverages. Visual examination reveals cavity on occlusal surface.",
-  treatment:
-    "Composite filling performed after removing decay. Local anesthesia administered. Post-operative care instructions provided.",
-  nextVisit: "22 January 2025",
-  medicines: [
-    {
-      name: "Amoxicillin 500mg",
-      dosage: "1 tablet, 3 times daily for 5 days",
-    },
-    {
-      name: "Ibuprofen 400mg",
-      dosage: "1 tablet when needed for pain (max 3 per day)",
-    },
-    {
-      name: "Chlorhexidine Mouthwash",
-      dosage: "Rinse twice daily for 7 days",
-    },
-  ],
-  attachments: [
-    {
-      name: "x-ray-upper-right.jpg",
-      url: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=500",
-      type: "image",
-    },
-    {
-      name: "prescription.pdf",
-      url: "#",
-      type: "pdf",
-    },
-  ],
-  payment: {
-    status: "Paid",
-    amount: 2500,
-    mode: "UPI",
-  },
-  timeline: [
-    {
-      action: "Appointment booked",
-      timestamp: "10 Jan 2025, 02:30 PM",
-    },
-    {
-      action: "Reminder sent via SMS",
-      timestamp: "14 Jan 2025, 06:00 PM",
-    },
-    {
-      action: "Patient checked in",
-      timestamp: "15 Jan 2025, 10:25 AM",
-    },
-    {
-      action: "Consultation completed",
-      timestamp: "15 Jan 2025, 11:15 AM",
-    },
-    {
-      action: "Report uploaded",
-      timestamp: "15 Jan 2025, 11:30 AM",
-    },
-  ],
-};
-
 const ReportsPage = () => {
   const params = useSearchParams();
   const id = params.get("appointmentId");
-  console.log(id);
   const [appointment, setAppointment] = useState({
     name: "",
     appointment_id: "",
@@ -144,7 +66,7 @@ const ReportsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="bg-linear-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+        <div className="bg-linear-to-r from-teal-600 to-teal-700 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-start justify-between mb-4">
             <div>
               <span
@@ -193,7 +115,6 @@ const ReportsPage = () => {
           </div>
         </div>
 
-        {/* Patient data  */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">
             Patient Details
