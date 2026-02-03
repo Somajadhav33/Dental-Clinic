@@ -219,7 +219,7 @@ const AboutPage = () => {
             <div className="relative mb-6">
               <div className="relative h-100 w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
                 <Image
-                  src="/g5.jpg"
+                  src="/doctor.png"
                   alt="Dr. Bhushan Dadaso Tale"
                   fill
                   className="object-cover"
@@ -257,7 +257,7 @@ const AboutPage = () => {
             <div className="relative mb-6">
               <div className="relative h-100 w-full rounded-2xl overflow-hidden border-4 border-white shadow-lg">
                 <Image
-                  src="/g5.jpg"
+                  src="/doctor.png"
                   alt="Dr. Bhushan Dadaso Tale"
                   fill
                   className="object-cover"
