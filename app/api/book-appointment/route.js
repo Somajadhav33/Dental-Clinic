@@ -34,6 +34,15 @@ export async function POST(request) {
       );
     }
 
+    const clean = new Date(appointment_date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
     const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
 
     const uniqueId =
@@ -52,9 +61,9 @@ export async function POST(request) {
         phone,
         email || null,
         service,
-        appointment_date,
+        clean,
         appointment_time,
-        "pending",
+        "Pending",
         notes || null,
         createdAt,
         uniqueId,
