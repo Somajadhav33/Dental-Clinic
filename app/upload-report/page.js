@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -14,6 +14,7 @@ import {
   X,
   Calendar,
 } from "lucide-react";
+import { REPORT_READY_EMAIL } from "@/model/emailTemplates";
 
 const ReportUploadPage = () => {
   const searchParams = useSearchParams();
@@ -31,6 +32,50 @@ const ReportUploadPage = () => {
   const [documents, setDocuments] = useState([
     { name: "", url: "", type: "image" },
   ]);
+  const [patient, setPatient] = useState(null);
+
+  useEffect(() => {
+    const featchData = async () => {
+      const response = await fetch(`/api/book-appointment/${appointmentId}`);
+      const data = await response.json();
+      setPatient(data);
+    };
+    featchData();
+  }, [appointmentId]);
+  console.log(patient);
+
+  const sendReportEmail = async (patient, reporturl) => {
+    if (!patient?.email) {
+      console.warn("No email found for appointment → skipping email");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: patient.email,
+          subject: "Your Dental Report is Ready – Aabha Dental Clinic",
+          text: `Dear ${patient.name || "Patient"}, your dental report is now ready. Please check your email for the full details.`,
+          html: REPORT_READY_EMAIL({
+            patientName: patient.name || "Patient",
+            appointmentId: patient.appointment_id,
+            reportUrl: reporturl,
+          }),
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || `HTTP ${response.status}`);
+      }
+
+      console.log("Confirmation email sent successfully");
+    } catch (err) {
+      console.error("Failed to send confirmation email:", err);
+    }
+  };
 
   const handleReportChange = (e) => {
     const { name, value } = e.target;
@@ -79,22 +124,18 @@ const ReportUploadPage = () => {
     setDocuments(updatedDocuments);
   };
 
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!reportData.diagnosis || !reportData.treatment) {
       toast.error("Diagnosis and Treatment are required fields");
       return;
     }
 
-    // Validate medicines
     const validMedicines = medicines.filter(
       (med) => med.name.trim() !== "" && med.dosage.trim() !== "",
     );
 
-    // Validate documents
     const validDocuments = documents.filter(
       (doc) => doc.name.trim() !== "" && doc.url.trim() !== "",
     );
@@ -122,7 +163,10 @@ const ReportUploadPage = () => {
         throw new Error("Failed to upload report");
       }
 
-      const result = await response.json();
+      const url = `http://localhost:3000/reports?appointmentId=${appointmentId}`;
+
+      await sendReportEmail(patient.data, url);
+
       toast.success("Report uploaded successfully!");
 
       // Reset form
@@ -159,14 +203,12 @@ const ReportUploadPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Report Details Section */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               Report Details
             </h2>
 
             <div className="space-y-4">
-              {/* Diagnosis */}
               <div>
                 <label
                   htmlFor="diagnosis"
@@ -187,7 +229,6 @@ const ReportUploadPage = () => {
                 />
               </div>
 
-              {/* Observations */}
               <div>
                 <label
                   htmlFor="observations"
@@ -207,7 +248,6 @@ const ReportUploadPage = () => {
                 />
               </div>
 
-              {/* Treatment */}
               <div>
                 <label
                   htmlFor="treatment"
@@ -228,11 +268,10 @@ const ReportUploadPage = () => {
                 />
               </div>
 
-              {/* Next Visit */}
               <div>
                 <label
                   htmlFor="next_visit"
-                  className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"
+                  className="block text-sm font-medium text-gray-700 mb-1  items-center gap-2"
                 >
                   <Calendar size={16} />
                   Next Visit Date
@@ -250,7 +289,6 @@ const ReportUploadPage = () => {
             </div>
           </div>
 
-          {/* Medicines Section */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
@@ -261,7 +299,7 @@ const ReportUploadPage = () => {
                 type="button"
                 onClick={addMedicine}
                 disabled={isLoading}
-                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 bg-teal-600 cursor-pointer text-white text-sm rounded-md hover:bg-teal-700 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 <Plus size={16} />
                 Add Medicine
@@ -275,7 +313,6 @@ const ReportUploadPage = () => {
                   className="border border-gray-200 rounded-lg p-4 relative"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Medicine Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Medicine Name
@@ -292,7 +329,6 @@ const ReportUploadPage = () => {
                       />
                     </div>
 
-                    {/* Dosage */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Dosage
@@ -310,13 +346,12 @@ const ReportUploadPage = () => {
                     </div>
                   </div>
 
-                  {/* Remove Button */}
                   {medicines.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeMedicine(index)}
                       disabled={isLoading}
-                      className="absolute top-2 right-2 text-red-600 hover:text-red-700 disabled:opacity-50"
+                      className="absolute top-2 right-2 cursor-pointer text-red-600 hover:text-red-700 disabled:opacity-50"
                       title="Remove medicine"
                     >
                       <Trash2 size={18} />
@@ -327,7 +362,6 @@ const ReportUploadPage = () => {
             </div>
           </div>
 
-          {/* Documents Section */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
@@ -338,7 +372,7 @@ const ReportUploadPage = () => {
                 type="button"
                 onClick={addDocument}
                 disabled={isLoading}
-                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 bg-teal-600 text-white text-sm cursor-pointer rounded-md hover:bg-teal-700 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 <Plus size={16} />
                 Add Document
@@ -352,7 +386,6 @@ const ReportUploadPage = () => {
                   className="border border-gray-200 rounded-lg p-4 relative"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Document Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Document Name
@@ -369,7 +402,6 @@ const ReportUploadPage = () => {
                       />
                     </div>
 
-                    {/* Document URL */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Document URL
@@ -386,7 +418,6 @@ const ReportUploadPage = () => {
                       />
                     </div>
 
-                    {/* Document Type */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Type
@@ -406,13 +437,12 @@ const ReportUploadPage = () => {
                     </div>
                   </div>
 
-                  {/* Remove Button */}
                   {documents.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeDocument(index)}
                       disabled={isLoading}
-                      className="absolute top-2 right-2 text-red-600 hover:text-red-700 disabled:opacity-50"
+                      className="absolute top-2 cursor-pointer right-2 text-red-600 hover:text-red-700 disabled:opacity-50"
                       title="Remove document"
                     >
                       <Trash2 size={18} />
