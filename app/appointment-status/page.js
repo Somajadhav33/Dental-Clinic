@@ -78,10 +78,11 @@ const GetReportContainer = () => {
               type="text"
               id="appointmentId"
               value={appointmentId}
-              onChange={(e) => setAppointmentId(e.target.value)}
+              maxLength={16}
+              onChange={(e) => setAppointmentId(e.target.value.trim())}
               onKeyPress={handleKeyPress}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-              placeholder="e.g., 12345"
+              placeholder="e.g., AABHA-MI923-CCZF"
               disabled={isLoading}
             />
           </div>
