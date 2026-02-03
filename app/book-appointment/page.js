@@ -1,13 +1,17 @@
 "use client";
 
 import AppointMentSuccessCard from "@/components/AppointmentSuccessPage";
-import { BOOKING_CONFIRMATION_EMAIL } from "@/model/emailTemplates";
-import { useSearchParams } from "next/navigation";
+import {
+  APPOINTMENT_RESCHEDULED_EMAIL,
+  BOOKING_CONFIRMATION_EMAIL,
+} from "@/model/emailTemplates";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect, Suspense } from "react";
 
 const AppointmentFormContent = () => {
   const searchParams = useSearchParams();
   const params = useSearchParams();
+  const router = useRouter();
   const query = {
     name: params.get("name"),
     phone: params.get("phone"),
@@ -18,6 +22,8 @@ const AppointmentFormContent = () => {
     at: params.get("at"),
     note: params.get("name") ? "Resheduled Your Appointment" : "",
   };
+
+  const is_resheduled = query.name && query.email && query.phone;
   const rawDate = query.date || "";
 
   const appointment_date = rawDate
@@ -51,7 +57,6 @@ const AppointmentFormContent = () => {
     fetchCategories();
   }, []);
 
-  // Read service from URL
   useEffect(() => {
     const serviceFromUrl = searchParams.get("service");
     if (serviceFromUrl) {
@@ -79,16 +84,30 @@ const AppointmentFormContent = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: appointment.email,
-          subject: "Your Appointment is Confirmed – Aabha Dental Clinic",
+          subject: is_resheduled
+            ? "Your Appointment Has Been Rescheduled – Aabha Dental Clinic"
+            : "Your Appointment is Confirmed – Aabha Dental Clinic",
           text: `Dear ${appointment.patient_name || "Patient"}`,
-          html: BOOKING_CONFIRMATION_EMAIL({
-            patientName: appointment.name || "Patient",
-            appointmentId: appointment.appointment_id,
-            date: appointment.preferred_date,
-            time: appointment.preferred_time,
-            service: appointment.service_name || "General Dental",
-            clinic: appointment.at || "Aabha Dental Clinic",
-          }),
+          html: is_resheduled
+            ? APPOINTMENT_RESCHEDULED_EMAIL({
+                patientName: appointment.name || "Patient",
+                appointmentId: appointment.appointment_id,
+                oldDate: query.date,
+                oldTime: query.time,
+                oldService: query.service,
+                newDate: appointment.preferred_date,
+                newTime: appointment.preferred_time,
+                newService: appointment.service_name || "General Dental",
+                clinic: appointment.at || "Aabha Dental Clinic",
+              })
+            : BOOKING_CONFIRMATION_EMAIL({
+                patientName: appointment.name || "Patient",
+                appointmentId: appointment.appointment_id,
+                date: appointment.preferred_date,
+                time: appointment.preferred_time,
+                service: appointment.service_name || "General Dental",
+                clinic: appointment.at || "Aabha Dental Clinic",
+              }),
         }),
       });
 
@@ -129,8 +148,12 @@ const AppointmentFormContent = () => {
 
         const appointment = data.appointment;
         await sendConfirmationEmail(appointment);
+        if (is_resheduled) {
+          router.push("/admin-panel");
+        } else {
+          setShowSuccess(true);
+        }
 
-        setShowSuccess(true);
         setFormData({
           patient_name: "",
           phone: "",
@@ -243,11 +266,17 @@ const AppointmentFormContent = () => {
                   value={formData.service}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                 >
-                  <option value="">Select a service</option>
+                  <option className="cursor-pointer" value="">
+                    Select a service
+                  </option>
                   {categories.map((service) => (
-                    <option key={service.id} value={service.name}>
+                    <option
+                      className="font-semibold cursor-pointer"
+                      key={service.id}
+                      value={service.name}
+                    >
                       {service.name}
                     </option>
                   ))}
@@ -268,7 +297,7 @@ const AppointmentFormContent = () => {
                   onChange={handleChange}
                   required
                   min={today}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg  focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
                 />
               </div>
               <div>
