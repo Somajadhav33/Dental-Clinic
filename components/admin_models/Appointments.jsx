@@ -18,6 +18,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import {
+  APPOINTMENT_CONFIRMED_EMAIL,
+  APPOINTMENT_CANCELLED_EMAIL,
+} from "@/model/emailTemplates";
 
 const getAppointments = async () => {
   const response = await fetch("http://localhost:3000/api/book-appointment");
@@ -43,6 +47,64 @@ const AppointmentsContent = () => {
       });
   }, []);
 
+  const sendConfirmationEmail = async (appointment) => {
+    try {
+      const response = await fetch("/api/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: appointment.email,
+          subject: "Your Appointment is Confirmed – Aabha Dental Clinic",
+          text: `Dear ${appointment.name || "Patient"}`,
+          html: APPOINTMENT_CONFIRMED_EMAIL({
+            patientName: appointment.name || "Patient",
+            appointmentId: appointment.appointment_id,
+            date: formatDate(appointment.preferred_date),
+            time: appointment.preferred_time,
+            clinic: appointment.at || "Aabha Dental Clinic",
+          }),
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to send confirmation email");
+      } else {
+        toast.success("Confirmation email sent");
+      }
+    } catch (error) {
+      console.error("Error sending confirmation email:", error);
+    }
+  };
+
+  const sendCancellationEmail = async (appointment) => {
+    try {
+      const response = await fetch("/api/send-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: appointment.email,
+          subject: "Appointment Cancelled – Aabha Dental Clinic",
+          text: `Dear ${appointment.name || "Patient"}`,
+          html: APPOINTMENT_CANCELLED_EMAIL({
+            patientName: appointment.name || "Patient",
+            appointmentId: appointment.appointment_id,
+            date: formatDate(appointment.preferred_date),
+            time: appointment.preferred_time,
+            reason: "by the clinic",
+          }),
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to send cancellation email");
+      } else {
+        toast.success("Cancellation email sent");
+      }
+    } catch (error) {
+      console.error("Error sending cancellation email:", error);
+    }
+  };
+
   const handleStatusChange = async (id, newStatus) => {
     setUpdating(true);
     const result = await fetch("http://localhost:3000/api/book-appointment", {
@@ -58,6 +120,16 @@ const AppointmentsContent = () => {
 
     if (!result.ok) {
       toast.error("Error while updating status");
+      setUpdating(false);
+      return;
+    }
+
+    const appointment = appointments.find((apt) => apt.id === id);
+
+    if (newStatus === "Confirmed" && appointment) {
+      await sendConfirmationEmail(appointment);
+    } else if (newStatus === "Cancelled" && appointment) {
+      await sendCancellationEmail(appointment);
     }
 
     setAppointments(
@@ -100,11 +172,9 @@ const AppointmentsContent = () => {
   };
 
   const formatTime = (timeString) => {
-    // If time is already in HH:MM format, return as is
     if (timeString && timeString.includes(":")) {
       return timeString;
     }
-    // Otherwise format it
     const time = new Date(`2000-01-01T${timeString}`);
     return time.toLocaleTimeString("en-IN", {
       hour: "2-digit",
@@ -172,84 +242,76 @@ const AppointmentsContent = () => {
     }
   };
 
-  // Render buttons based on appointment status
   const renderActionButtons = (appointment) => {
     const status = appointment.status;
 
     return (
       <div className="flex flex-wrap gap-2">
-        {/* Confirm Button - Show only for Pending */}
         {status === "Pending" && (
           <button
             onClick={() => handleStatusChange(appointment.id, "Confirmed")}
             disabled={updating}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
           >
             <CheckCircle2 className="w-4 h-4" />
             {updating ? "Confirming..." : "Confirm"}
           </button>
         )}
 
-        {/* Complete Button - Show only for Confirmed */}
         {status === "Confirmed" && (
           <button
             onClick={() => handleStatusChange(appointment.id, "Completed")}
             disabled={updating}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
           >
             <CheckCircle2 className="w-4 h-4" />
             {updating ? "Completing..." : "Complete"}
           </button>
         )}
 
-        {/* Reschedule Button - Show for Pending, Confirmed */}
         {(status === "Pending" || status === "Confirmed") && (
           <Link
             href={`/book-appointment?name=${appointment.name}&phone=${appointment.phone}&email=${appointment.email}&date=${appointment.preferred_date}&time=${appointment.preferred_time}&service=${appointment.service_name}&at=${appointment.at}`}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium shadow-sm"
+            className="inline-flex items-center cursor-pointer gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium shadow-sm"
           >
             <RefreshCw className="w-4 h-4" />
             Reschedule
           </Link>
         )}
 
-        {/* Upload Report Button - Show only for Completed */}
         {status === "Completed" && (
           <button
             onClick={() => {
               router.push(`/upload-report?id=${appointment.appointment_id}`);
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-fuchsia-600 text-white rounded-lg hover:bg-fuchsia-700 transition-colors text-sm font-medium shadow-sm"
+            className="inline-flex items-center cursor-pointer gap-2 px-4 py-2 bg-fuchsia-600 text-white rounded-lg hover:bg-fuchsia-700 transition-colors text-sm font-medium shadow-sm"
           >
             <Upload className="w-4 h-4" />
             Upload Report
           </button>
         )}
 
-        {/* Call Button - Show for all except Cancelled */}
         {status !== "Cancelled" && (
           <Link
             href={`tel:${appointment.phone}`}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium shadow-sm"
+            className="inline-flex items-center cursor-pointer gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium shadow-sm"
           >
             <Phone className="w-4 h-4" />
             Call
           </Link>
         )}
 
-        {/* Cancel Button - Show for Pending and Confirmed */}
         {(status === "Pending" || status === "Confirmed") && (
           <button
             onClick={() => handleStatusChange(appointment.id, "Cancelled")}
             disabled={updating}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
+            className="inline-flex items-center cursor-pointer gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50"
           >
             <XCircle className="w-4 h-4" />
             {updating ? "Cancelling..." : "Cancel"}
           </button>
         )}
 
-        {/* Send Reminder Button - Show for Pending and Confirmed */}
         {(status === "Pending" || status === "Confirmed") && (
           <button
             onClick={() =>
@@ -262,7 +324,7 @@ const AppointmentsContent = () => {
                 appointment.at,
               )
             }
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
+            className="inline-flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
           >
             <Bell className="w-4 h-4" />
             Send Reminder
