@@ -9,7 +9,10 @@ const Footer = () => {
           © 2026 AABHA DENTAL CLINIC. All rights reserved.
         </span>
 
-        <Link href="/admin-login" className="hover:text-white transition">
+        <Link
+          href="/admin-login"
+          className="font-semibold blur-md hover:blur-none transition duration-300"
+        >
           Admin Login
         </Link>
       </div>
