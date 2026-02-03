@@ -1,4 +1,5 @@
 import React from "react";
+import Cookies from "js-cookie";
 
 const TopBar = () => {
   const date = new Date();
@@ -20,8 +21,12 @@ const TopBar = () => {
         <p className="text-sm text-gray-500">Login time: {formatted}</p>
       </div>
       <button
+        onClick={() => {
+          Cookies.remove("jwtToken");
+          window.location.href = "/admin-login";
+        }}
         type="button"
-        className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 transition"
+        className="px-4 py-2 text-sm font-medium cursor-pointer text-white bg-red-500 rounded hover:bg-red-600 transition"
       >
         Log Out
       </button>
@@ -30,8 +35,3 @@ const TopBar = () => {
 };
 
 export default TopBar;
-
-// ┌──────────────────────────────────────────────┐
-// │  DENTAL CLINIC ADMIN            Logout       │
-// │  Today: 15 Jan 2026                            │
-// └──────────────────────────────────────────────┘
