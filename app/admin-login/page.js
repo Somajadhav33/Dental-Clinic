@@ -21,9 +21,6 @@ export default function AdminLogin() {
     }
   }, []);
 
-  /**
-   * Verify if the stored JWT token is still valid
-   */
   const verifyToken = async (token) => {
     try {
       const res = await fetch("/api/verify", {
