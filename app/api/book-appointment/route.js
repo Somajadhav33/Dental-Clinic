@@ -1,6 +1,5 @@
 import db from "@/lib/db";
 import { NextResponse } from "next/server";
-import { success } from "zod";
 
 export async function GET(request) {
   const result = await db.query("SELECT * FROM appointments");

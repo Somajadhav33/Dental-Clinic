@@ -107,7 +107,7 @@ const AppointmentsContent = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     setUpdating(true);
-    const result = await fetch("http://localhost:3000/api/book-appointment", {
+    const result = await fetch("/api/book-appointment", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -143,7 +143,7 @@ const AppointmentsContent = () => {
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to cancel this appointment?")) {
-      const result = await fetch("http://localhost:3000/api/book-appointment", {
+      const result = await fetch("/api/book-appointment", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

@@ -6,6 +6,10 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET =
   process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") {
+  throw new Error("JWT_SECRET is not defined in production environment!");
+}
+
 export async function POST(request) {
   try {
     const { username, password } = await request.json();

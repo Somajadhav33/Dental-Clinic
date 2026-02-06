@@ -1,13 +1,23 @@
 import React from "react";
-import axios from "axios";
+import db from "@/lib/db";
 
 const getFaqs = async () => {
-  const faq = await axios.get("http://localhost:3000/api/dental-faqs");
-  return faq;
+  try {
+    const result = await db.query("SELECT * FROM faq");
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching FAQs:", error);
+    return [];
+  }
 };
 
 export const FAQComponent = async () => {
-  const faq = await getFaqs();
+  const faqs = await getFaqs();
+
+  if (!faqs || faqs.length === 0) {
+    return null;
+  }
+
   return (
     <div className="w-full mx-auto px-6 py-12">
       <div className="text-center mb-12">
@@ -20,7 +30,7 @@ export const FAQComponent = async () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {faq.data.map((item) => (
+        {faqs.map((item) => (
           <div
             key={item.id}
             className="bg-white rounded-lg shadow-md border border-gray-200 p-8 hover:shadow-lg transition-shadow"

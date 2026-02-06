@@ -1,22 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
+import db from "@/lib/db";
 
 async function getServices() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/dental-services`,
-    {
-      cache: "no-store",
-    },
-  );
+  try {
+    const result = await db.query(
+      "SELECT * FROM services ORDER BY display_order ASC",
+    );
 
-  if (!res.ok) throw new Error("Failed to fetch services");
-
-  return res.json();
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching services:", error);
+    return [];
+  }
 }
 
 export default async function ServiceCard() {
-  const servicesData = await getServices();
-  const { services } = servicesData;
+  const services = await getServices();
+
+  if (!services || services.length === 0) {
+    return null;
+  }
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 p-6">
       {services.map(({ id, name, description, image_url, is_active }) => (
@@ -26,7 +31,7 @@ export default async function ServiceCard() {
         >
           <div className="w-full mt-1.5 md:w-56 lg:w-55 rounded-2xl h-48 bg-[#e6dcd2] shrink-0 border-b md:border-b-0 md:border-r border-orange-100 flex items-center justify-center">
             <Image
-              src={image_url}
+              src={image_url || "/placeholder-service.png"}
               alt={name}
               width={300}
               height={300}

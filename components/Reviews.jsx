@@ -1,11 +1,25 @@
-import axios from "axios";
+import db from "@/lib/db";
 import React from "react";
 import Marquee from "react-fast-marquee";
 
+const getReviews = async () => {
+  try {
+    const result = await db.query(
+      "SELECT * FROM reviews ORDER BY created_at DESC",
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return [];
+  }
+};
+
 const ReviewsComponent = async () => {
-  const { data: reviews } = await axios.get(
-    "http://localhost:3000/api/dental-reviews",
-  );
+  const reviews = await getReviews();
+
+  if (!reviews || reviews.length === 0) {
+    return null;
+  }
 
   const renderStars = (rating) => (
     <div className="flex gap-1">

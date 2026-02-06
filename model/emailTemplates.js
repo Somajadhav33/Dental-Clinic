@@ -262,7 +262,7 @@ export const APPOINTMENT_RESCHEDULED_EMAIL = ({
                   <p style="color:#666666;font-size:12px;margin:0 0 10px;">New Appointment</p>
                   <p style="color:#2c5282;font-size:18px;margin:0;font-weight:bold;">${newDate}</p>
                   <p style="color:#2c5282;font-size:16px;margin:5px 0 0;font-weight:bold;">${newTime}</p>
-                  <p style="color:#666666;font-size:10px;margin:5px 0 0;text-decoration:line-through;">(${newService})</p>
+                  <p style="color:#666666;font-size:10px;margin:5px 0 0;">(${newService})</p>
                 </td>
               </tr>
             </table>

@@ -16,7 +16,9 @@ import {
 } from "lucide-react";
 import { REPORT_READY_EMAIL } from "@/model/emailTemplates";
 
-const ReportUploadPage = () => {
+import { Suspense } from "react";
+
+const ReportUploadContent = () => {
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get("id");
   const router = useRouter();
@@ -163,7 +165,7 @@ const ReportUploadPage = () => {
         throw new Error("Failed to upload report");
       }
 
-      const url = `http://localhost:3000/reports?appointmentId=${appointmentId}`;
+      const url = `${window.location.origin}/reports?appointmentId=${appointmentId}`;
 
       await sendReportEmail(patient.data, url);
 
@@ -467,6 +469,16 @@ const ReportUploadPage = () => {
         </form>
       </div>
     </div>
+  );
+};
+
+const ReportUploadPage = () => {
+  return (
+    <Suspense
+      fallback={<div className="p-10 text-center">Loading Upload Page...</div>}
+    >
+      <ReportUploadContent />
+    </Suspense>
   );
 };
 

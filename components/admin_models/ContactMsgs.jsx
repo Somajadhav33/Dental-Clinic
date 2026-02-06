@@ -2,18 +2,27 @@
 import { X } from "lucide-react";
 
 import React, { useState } from "react";
-import axios from "axios";
-
-const getMessages = async () => {
-  const data = await axios.get("http://localhost:3000/api/contact-us");
-  return data.data;
-};
-
-const CnMessages = await getMessages();
-
 const ContactMessages = () => {
-  const [messages, setMessages] = useState(CnMessages);
+  const [messages, setMessages] = useState({ data: [] });
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState(null);
+
+  React.useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch("/api/contact-us");
+        if (!response.ok) throw new Error("Failed to fetch messages");
+        const data = await response.json();
+        setMessages(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, []);
 
   const openModal = (msg) => {
     setSelectedMessage(msg);
@@ -38,24 +47,41 @@ const ContactMessages = () => {
           </thead>
 
           <tbody>
-            {messages.data.map((msg) => (
-              <tr key={msg.id} className="border-b hover:bg-gray-50 transition">
-                <td className="px-4 py-3">{msg.created_at}</td>
-                <td className="px-4 py-3 font-medium text-gray-800">
-                  {msg.name}
-                </td>
-                <td className="px-4 py-3">{msg.phone}</td>
-                <td className="px-4 py-3">{msg.email}</td>
-                <td className="px-4 py-3">
-                  <button
-                    onClick={() => openModal(msg)}
-                    className="text-blue-600 hover:underline font-medium cursor-pointer"
-                  >
-                    View
-                  </button>
+            {isLoading ? (
+              <tr>
+                <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
+                  Loading messages...
                 </td>
               </tr>
-            ))}
+            ) : messages.data.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
+                  No messages found.
+                </td>
+              </tr>
+            ) : (
+              messages.data.map((msg) => (
+                <tr
+                  key={msg.id}
+                  className="border-b hover:bg-gray-50 transition"
+                >
+                  <td className="px-4 py-3">{msg.created_at}</td>
+                  <td className="px-4 py-3 font-medium text-gray-800">
+                    {msg.name}
+                  </td>
+                  <td className="px-4 py-3">{msg.phone}</td>
+                  <td className="px-4 py-3">{msg.email}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => openModal(msg)}
+                      className="text-blue-600 hover:underline font-medium cursor-pointer"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

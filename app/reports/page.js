@@ -22,7 +22,9 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Report from "@/components/Report";
 
-const ReportsPage = () => {
+import { Suspense } from "react";
+
+const ReportsContent = () => {
   const params = useSearchParams();
   const id = params.get("appointmentId");
   const [appointment, setAppointment] = useState({
@@ -32,7 +34,6 @@ const ReportsPage = () => {
     preferred_date: "",
     preferred_time: "",
     at: "",
-    name: "",
     phone: "",
     email: "",
   });
@@ -162,6 +163,16 @@ const ReportsPage = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const ReportsPage = () => {
+  return (
+    <Suspense
+      fallback={<div className="p-10 text-center">Loading Report Page...</div>}
+    >
+      <ReportsContent />
+    </Suspense>
   );
 };
 
