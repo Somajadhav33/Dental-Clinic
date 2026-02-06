@@ -24,7 +24,7 @@ import {
 } from "@/model/emailTemplates";
 
 const getAppointments = async () => {
-  const response = await fetch("http://localhost:3000/api/book-appointment");
+  const response = await fetch("/api/book-appointment");
   if (!response.ok) throw new Error("Something went wrong");
   return response.json();
 };
