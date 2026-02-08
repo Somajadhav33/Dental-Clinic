@@ -16,7 +16,7 @@ export async function GET(request) {
     let sent24h = 0;
     let sent4h = 0;
 
-    //SEND 24-HOUR REMINDERS (Tomorrow)
+    // SEND 24-HOUR REMINDERS (Tomorrow)
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -101,17 +101,17 @@ export async function GET(request) {
       }
     }
 
-    //SEND 4-HOUR REMINDERS (Today)
+    //SEND 4-HOUR REMINDERS (Sliding Window)
+
     const now = new Date();
-    const todayDate = now.toISOString().split("T")[0]; // YYYY-MM-DD format
-
-    // Calculate 4 hours from now
     const in4Hours = new Date(now.getTime() + 4 * 60 * 60 * 1000);
-    const in5Hours = new Date(now.getTime() + 5 * 60 * 60 * 1000);
 
-    // Convert to TIME format (HH:MM:SS)
-    const targetTimeStart = in4Hours.toTimeString().split(" ")[0]; // HH:MM:SS
-    const targetTimeEnd = in5Hours.toTimeString().split(" ")[0]; // HH:MM:SS
+    const nowTimestamp = now.toISOString();
+    const in4HoursTimestamp = in4Hours.toISOString();
+
+    console.log(
+      `🔍 Checking 4h reminders from ${nowTimestamp} to ${in4HoursTimestamp}`,
+    );
 
     const appointments4h = await db.query(
       `SELECT 
@@ -123,22 +123,32 @@ export async function GET(request) {
         preferred_date, 
         preferred_time, 
         at,
-        status
+        status,
+        (preferred_date || ' ' || preferred_time)::timestamp as appointment_timestamp
        FROM appointments 
-       WHERE preferred_date = $1 
-       AND preferred_time >= $2
-       AND preferred_time <= $3
-       AND status = 'Confirmed'
+       WHERE status = 'Confirmed'
        AND reminder4h = false 
        AND email IS NOT NULL 
        AND email != ''
-       ORDER BY preferred_time ASC`,
-      [todayDate, targetTimeStart, targetTimeEnd],
+       AND (preferred_date || ' ' || preferred_time)::timestamp > $1::timestamp
+       AND (preferred_date || ' ' || preferred_time)::timestamp <= $2::timestamp
+       ORDER BY appointment_timestamp ASC`,
+      [nowTimestamp, in4HoursTimestamp],
+    );
+
+    console.log(
+      ` Found ${appointments4h.rows.length} appointments for 4h reminders`,
     );
 
     for (const apt of appointments4h.rows) {
       try {
         const displayTime = apt.preferred_time.substring(0, 5); // Get HH:MM from HH:MM:SS
+
+        const appointmentTime = new Date(apt.appointment_timestamp);
+        const hoursUntil = Math.round(
+          (appointmentTime - now) / (1000 * 60 * 60),
+        );
+        const minutesUntil = Math.round((appointmentTime - now) / (1000 * 60));
 
         await sendEmail({
           to: apt.email,
@@ -147,7 +157,7 @@ export async function GET(request) {
             <div style="font-family: Arial; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h2 style="color: #f5576c;">Appointment Today!</h2>
               <p>Dear <strong>${apt.name}</strong>,</p>
-              <p>Your appointment is in approximately 4 hours:</p>
+              <p>Your appointment is in approximately ${hoursUntil} ${hoursUntil === 1 ? "hour" : "hours"}:</p>
               <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
                 <h1 style="color: #856404; margin: 0;">${displayTime}</h1>
                 <p style="color: #856404;">📍 ${apt.at}</p>
@@ -170,7 +180,7 @@ export async function GET(request) {
         );
         sent4h++;
         console.log(
-          `✅ 4h reminder sent: ${apt.appointment_id} to ${apt.email}`,
+          `✅ 4h reminder sent: ${apt.appointment_id} to ${apt.email} (${hoursUntil}h ${minutesUntil % 60}m until appointment)`,
         );
       } catch (error) {
         console.error("Failed to send 4h reminder:", apt.appointment_id, error);
@@ -183,9 +193,19 @@ export async function GET(request) {
       sent_4h: sent4h,
       total: sent24h + sent4h,
       time: new Date().toISOString(),
+      window: {
+        now: nowTimestamp,
+        until: in4HoursTimestamp,
+      },
     });
   } catch (error) {
     console.error("Cron job error:", error);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Failed",
+        message: error.message,
+      },
+      { status: 500 },
+    );
   }
 }
