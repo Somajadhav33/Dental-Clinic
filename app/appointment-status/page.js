@@ -93,7 +93,7 @@ const GetReportContainer = () => {
             className="w-full cursor-pointer px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Search size={20} />
-            {isLoading ? "Loading..." : "Get Report"}
+            {isLoading ? "Loading...." : "Get Report"}
           </button>
         </div>
 
