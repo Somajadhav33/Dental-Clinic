@@ -34,7 +34,6 @@ const AppointmentsContent = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  console.log(appointments);
   useEffect(() => {
     getAppointments()
       .then((data) => {
