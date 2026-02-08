@@ -5,8 +5,11 @@ import { sendEmail } from "@/lib/email";
 export async function GET(request) {
   try {
     // security
-    const secret = request.headers.get("authorization");
-    if (secret !== `Bearer ${process.env.CRON_SECRET}`) {
+    const authHeader = request.headers.get("authorization");
+    const expectedSecret = process.env.CRON_SECRET?.replace(/['"]/g, "").trim();
+    const providedSecret = authHeader?.replace("Bearer ", "").trim();
+
+    if (!expectedSecret || providedSecret !== expectedSecret) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

@@ -2,7 +2,7 @@ name: Appointment Reminder Cron
 
 on:
   schedule:
-    - cron: "*/10 * * * *" # every 5 minutes
+    - cron: "*/10 * * * *" # every 10 minutes
   workflow_dispatch: # manual trigger button
 
 jobs:
@@ -11,6 +11,5 @@ jobs:
     steps:
       - name: Call Vercel Cron API
         run: |
-          curl -X GET \
-          -H "authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-          https://dental-clinic-two-omega.vercel.app/api/cron/reminders
+          curl -X GET "https://dental-clinic-two-omega.vercel.app/api/cron/reminders" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
