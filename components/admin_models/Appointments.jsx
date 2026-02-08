@@ -34,7 +34,7 @@ const AppointmentsContent = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-
+  console.log(appointments);
   useEffect(() => {
     getAppointments()
       .then((data) => {
@@ -507,15 +507,15 @@ const AppointmentsContent = () => {
                         }`}
                       ></div>
                       <span className="text-sm text-slate-700">
-                        2h before:{" "}
+                        4h before:{" "}
                         <span
                           className={
-                            appointment.reminder2h
+                            appointment.reminder4h
                               ? "text-emerald-600 font-medium"
                               : "text-slate-500"
                           }
                         >
-                          {appointment.reminder2h ? "Sent" : "Pending"}
+                          {appointment.reminder4h ? "Sent" : "Pending"}
                         </span>
                       </span>
                     </div>
