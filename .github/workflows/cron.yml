@@ -12,5 +12,5 @@ jobs:
       - name: Call Vercel Cron API
         run: |
           curl -X GET \
-          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -H "authorization: Bearer ${{ secrets.CRON_SECRET }}" \
           https://dental-clinic-two-omega.vercel.app/api/cron/reminders
