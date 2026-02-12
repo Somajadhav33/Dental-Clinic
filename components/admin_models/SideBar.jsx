@@ -37,6 +37,16 @@ const SideBar = ({ activeTab, setActiveTab }) => {
           Contact Messages
         </button>
         <button
+          onClick={() => setActiveTab("reports")}
+          className={`px-4 py-3 rounded-lg text-left cursor-pointer transition-colors duration-200 font-medium ${
+            activeTab === "reports"
+              ? "bg-blue-50 text-blue-600"
+              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+          }`}
+        >
+          Reports
+        </button>
+        <button
           onClick={() => setActiveTab("settings")}
           className={`px-4 py-3 rounded-lg text-left cursor-pointer transition-colors duration-200 font-medium ${
             activeTab === "settings"
