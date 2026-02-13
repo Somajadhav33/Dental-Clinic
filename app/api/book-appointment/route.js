@@ -2,10 +2,19 @@ import db from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-  const result = await db.query("SELECT * FROM appointments");
-  return NextResponse.json({ success: true, data: result });
+  try {
+    const result = await db.query(
+      "SELECT * FROM appointments ORDER BY created_at DESC",
+    );
+    return NextResponse.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch appointments" },
+      { status: 500 },
+    );
+  }
 }
-
 export async function POST(request) {
   try {
     const {
