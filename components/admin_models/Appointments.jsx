@@ -37,7 +37,7 @@ const AppointmentsContent = () => {
   useEffect(() => {
     getAppointments()
       .then((data) => {
-        setAppointments(data?.data?.rows || []);
+        setAppointments(data?.data || []);
         setLoading(false);
       })
       .catch((error) => {

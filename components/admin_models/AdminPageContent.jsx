@@ -7,6 +7,7 @@ import Services from "./Services";
 import SideBar from "./SideBar";
 import ContactMessages from "./ContactMsgs";
 import Settings from "./Settings";
+import AllReportsPage from "./AllReportsPage";
 
 const AdminPageContent = () => {
   const [activeTab, setActiveTab] = useState("appointments");
@@ -35,6 +36,13 @@ const AdminPageContent = () => {
                     Contact Messages
                   </h2>
                   <ContactMessages />
+                </div>
+              );
+            case "reports":
+              return (
+                <div className="p-8">
+                  <h2 className="text-3xl font-bold text-gray-800">Reports</h2>
+                  <AllReportsPage />
                 </div>
               );
 

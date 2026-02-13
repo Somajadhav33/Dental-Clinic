@@ -1,9 +1,52 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Trash2, Edit2, Save, X, Ban, CircleCheckBig } from "lucide-react";
+import {
+  Trash2,
+  Edit2,
+  Save,
+  X,
+  Ban,
+  CircleCheckBig,
+  Download,
+} from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
+
+// ─── CSV DOWNLOAD ─────────────────────────────────────────────────────────────
+const downloadCSV = (services) => {
+  if (!services.length) return;
+  const headers = [
+    "ID",
+    "Name",
+    "Category",
+    "Description",
+    "Image URL",
+    "Active",
+    "Display Order",
+  ];
+  const lines = [
+    headers.join(","),
+    ...services.map((s) =>
+      [
+        s.id,
+        `"${s.name}"`,
+        `"${s.category}"`,
+        `"${s.description?.replace(/"/g, '""')}"`,
+        s.image_url || "",
+        s.is_active ? "Yes" : "No",
+        s.display_order ?? "",
+      ].join(","),
+    ),
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `services-${new Date().toISOString().split("T")[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -21,12 +64,8 @@ const Services = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch("/api/dental-services", {
-          cache: "no-store",
-        });
-
+        const res = await fetch("/api/dental-services", { cache: "no-store" });
         if (!res.ok) throw new Error("Failed to fetch services");
-
         const data = await res.json();
         setServices(data.services || []);
       } catch (error) {
@@ -36,7 +75,6 @@ const Services = () => {
         setInitialLoading(false);
       }
     };
-
     fetchServices();
   }, []);
 
@@ -54,14 +92,11 @@ const Services = () => {
       toast.error("Please fill in all required fields");
       return;
     }
-
     setIsLoading(true);
     try {
       const response = await fetch("/api/dental-services", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           category: formData.category,
@@ -71,11 +106,7 @@ const Services = () => {
           display_order: services.length + 1,
         }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to add service");
-      }
-
+      if (!response.ok) throw new Error("Failed to add service");
       const newService = await response.json();
       setServices((prev) => [...prev, newService]);
       setFormData({
@@ -98,20 +129,12 @@ const Services = () => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/dental-services`, {
+        const response = await fetch("/api/dental-services", {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: id,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
         });
-
-        if (!response.ok) {
-          throw new Error("Failed to delete service");
-        }
-
+        if (!response.ok) throw new Error("Failed to delete service");
         setServices((prev) => prev.filter((service) => service.id !== id));
         toast.success("Service deleted successfully!");
       } catch (error) {
@@ -140,14 +163,11 @@ const Services = () => {
       toast.error("Please fill in all required fields");
       return;
     }
-
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/dental-services`, {
+      const response = await fetch("/api/dental-services", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingId,
           name: formData.name,
@@ -157,15 +177,21 @@ const Services = () => {
           is_active: formData.is_active,
         }),
       });
+      if (!response.ok) throw new Error("Failed to update service");
 
-      if (!response.ok) {
-        throw new Error("Failed to update service");
-      }
-
-      const updatedService = await response.json();
+      // ✅ FIX: update state directly from formData — don't rely on API response shape
       setServices((prev) =>
         prev.map((service) =>
-          service.id === editingId ? updatedService : service,
+          service.id === editingId
+            ? {
+                ...service,
+                name: formData.name,
+                category: formData.category,
+                description: formData.description,
+                image_url: formData.image_url,
+                is_active: formData.is_active, // ✅ this was being lost before
+              }
+            : service,
         ),
       );
 
@@ -209,6 +235,7 @@ const Services = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      {/* ── Add / Edit Form ── */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">
           {editingId ? "Update Service" : "Add New Service"}
@@ -297,9 +324,8 @@ const Services = () => {
               htmlFor="status"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Service is Active ?
+              Service is Active?
             </label>
-
             <select
               name="is_active"
               id="status"
@@ -341,10 +367,23 @@ const Services = () => {
         </form>
       </div>
 
+      {/* ── Services List ── */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">
-          Available Services
-        </h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Available Services
+          </h1>
+          {services.length > 0 && (
+            <button
+              onClick={() => downloadCSV(services)}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white text-sm font-semibold rounded-lg hover:bg-slate-900 active:scale-95 transition-all shadow-sm"
+            >
+              <Download size={15} />
+              Download CSV ({services.length})
+            </button>
+          )}
+        </div>
+
         {services.length === 0 ? (
           <p className="text-gray-500 text-center py-8">
             No services found. Add a new service to get started!
@@ -385,7 +424,7 @@ const Services = () => {
                   </p>
 
                   <p
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold w-fit ${
                       service.is_active
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
@@ -393,35 +432,29 @@ const Services = () => {
                   >
                     {service.is_active ? (
                       <>
-                        <CircleCheckBig size={14} />
-                        Active
+                        <CircleCheckBig size={14} /> Active
                       </>
                     ) : (
                       <>
-                        <Ban size={14} />
-                        Inactive
+                        <Ban size={14} /> Inactive
                       </>
                     )}
                   </p>
 
-                  <div className="flex gap-2 pt-4 border-t border-gray-100">
+                  <div className="flex gap-2 pt-4 border-t border-gray-100 mt-4">
                     <button
                       onClick={() => handleEdit(service)}
                       disabled={isLoading}
                       className="flex-1 px-3 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Edit service"
                     >
-                      <Edit2 size={16} />
-                      Edit
+                      <Edit2 size={16} /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(service.id)}
                       disabled={isLoading}
                       className="flex-1 px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Delete service"
                     >
-                      <Trash2 size={16} />
-                      Delete
+                      <Trash2 size={16} /> Delete
                     </button>
                   </div>
                 </div>

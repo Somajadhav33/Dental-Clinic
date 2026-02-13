@@ -1,7 +1,33 @@
 "use client";
-import { X } from "lucide-react";
-
+import { X, Download } from "lucide-react";
 import React, { useState } from "react";
+
+const downloadCSV = (data) => {
+  if (!data.length) return;
+  const headers = ["ID", "Name", "Phone", "Email", "Status", "Date", "Message"];
+  const lines = [
+    headers.join(","),
+    ...data.map((msg) =>
+      [
+        msg.id,
+        `"${msg.name}"`,
+        msg.phone,
+        msg.email || "",
+        msg.status,
+        msg.created_at,
+        `"${msg.messages?.replace(/"/g, '""')}"`,
+      ].join(","),
+    ),
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `contact-messages-${new Date().toISOString().split("T")[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 const ContactMessages = () => {
   const [messages, setMessages] = useState({ data: [] });
   const [isLoading, setIsLoading] = useState(true);
@@ -20,20 +46,29 @@ const ContactMessages = () => {
         setIsLoading(false);
       }
     };
-
     fetchMessages();
   }, []);
 
-  const openModal = (msg) => {
-    setSelectedMessage(msg);
-  };
-
-  const closeModal = () => {
-    setSelectedMessage(null);
-  };
+  const openModal = (msg) => setSelectedMessage(msg);
+  const closeModal = () => setSelectedMessage(null);
 
   return (
     <div className="p-6">
+      {/* ── Header with Download ── */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold text-gray-800">Contact Messages</h1>
+        {!isLoading && messages.data.length > 0 && (
+          <button
+            onClick={() => downloadCSV(messages.data)}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white text-sm font-semibold rounded-lg hover:bg-slate-900 active:scale-95 transition-all shadow-sm"
+          >
+            <Download size={15} />
+            Download CSV ({messages.data.length})
+          </button>
+        )}
+      </div>
+
+      {/* ── Table ── */}
       <div className="overflow-x-auto bg-white rounded shadow">
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
@@ -45,7 +80,6 @@ const ContactMessages = () => {
               <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
-
           <tbody>
             {isLoading ? (
               <tr>
@@ -86,9 +120,10 @@ const ContactMessages = () => {
         </table>
       </div>
 
+      {/* ── Modal ── */}
       {selectedMessage && (
         <div
-          className="fixed inset-0 bg-blur bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
           onClick={closeModal}
         >
           <div
@@ -107,7 +142,6 @@ const ContactMessages = () => {
               </button>
             </div>
 
-            {/* Body */}
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-semibold text-gray-600">
@@ -115,28 +149,24 @@ const ContactMessages = () => {
                 </label>
                 <p className="text-gray-900">{selectedMessage.id}</p>
               </div>
-
               <div>
                 <label className="text-sm font-semibold text-gray-600">
                   Name
                 </label>
                 <p className="text-gray-900">{selectedMessage.name}</p>
               </div>
-
               <div>
                 <label className="text-sm font-semibold text-gray-600">
                   Phone
                 </label>
                 <p className="text-gray-900">{selectedMessage.phone}</p>
               </div>
-
               <div>
                 <label className="text-sm font-semibold text-gray-600">
                   Email
                 </label>
                 <p className="text-gray-900">{selectedMessage.email}</p>
               </div>
-
               <div>
                 <label className="text-sm font-semibold text-gray-600">
                   Status
@@ -155,14 +185,12 @@ const ContactMessages = () => {
                   </span>
                 </p>
               </div>
-
               <div>
                 <label className="text-sm font-semibold text-gray-600">
                   Date
                 </label>
                 <p className="text-gray-900">{selectedMessage.created_at}</p>
               </div>
-
               <div>
                 <label className="text-sm font-semibold text-gray-600">
                   Message
@@ -173,7 +201,6 @@ const ContactMessages = () => {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end mt-6">
               <button
                 onClick={closeModal}
