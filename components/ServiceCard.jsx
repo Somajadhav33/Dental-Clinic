@@ -1,22 +1,24 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import db from "@/lib/db";
+import { useEffect, useState } from "react";
 
-async function getServices() {
-  try {
-    const result = await db.query(
-      "SELECT * FROM services ORDER BY display_order ASC",
-    );
-
-    return result.rows;
-  } catch (error) {
-    console.error("Error fetching services:", error);
-    return [];
-  }
-}
-
-export default async function ServiceCard() {
-  const services = await getServices();
+const ServiceCard = () => {
+  const [services, setServices] = useState([]);
+  useEffect(() => {
+    const getServices = async () => {
+      try {
+        const response = await fetch("/api/dental-services");
+        const data = await response.json();
+        setServices(data.services);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        return [];
+      }
+    };
+    getServices();
+  }, []);
 
   if (!services || services.length === 0) {
     return null;
@@ -73,4 +75,6 @@ export default async function ServiceCard() {
       ))}
     </div>
   );
-}
+};
+
+export default ServiceCard;

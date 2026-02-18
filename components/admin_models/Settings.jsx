@@ -1,159 +1,124 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 const Settings = () => {
-  // Clinic Information State
-  const [clinicInfo, setClinicInfo] = useState({
-    name: "AABHA DENTAL CLINIC",
-    phone: "+91 1234567890",
-    address: "123 Main Street, City, State - 400001",
-    email: "info@aabhadental.com",
-    workingHours: "Mon-Sat: 9:00 AM - 6:00 PM",
-  });
-
-  // Admin State
   const [adminData, setAdminData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // New Admin State
   const [newAdmin, setNewAdmin] = useState({
     name: "",
-    email: "",
+    username: "",
     password: "",
+    confirmPassword: "",
   });
+  const [adminLoading, setAdminLoading] = useState(false);
 
-  // Handle Clinic Info Change
-  const handleClinicChange = (e) => {
-    setClinicInfo({ ...clinicInfo, [e.target.name]: e.target.value });
-  };
-
-  // Handle Clinic Update
-  const handleClinicUpdate = () => {
-    console.log("Updating clinic info:", clinicInfo);
-    alert("Clinic information updated successfully!");
-    // Add API call here
-  };
-
-  // Handle Password Change
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e) =>
     setAdminData({ ...adminData, [e.target.name]: e.target.value });
-  };
 
-  // Handle Password Update
-  const handlePasswordUpdate = () => {
+  const handleNewAdminChange = (e) =>
+    setNewAdmin({ ...newAdmin, [e.target.name]: e.target.value });
+
+  const handlePasswordUpdate = async () => {
     if (
       !adminData.currentPassword ||
       !adminData.newPassword ||
       !adminData.confirmPassword
     ) {
-      alert("Please fill all password fields");
+      toast.error("Please fill all password fields");
       return;
     }
-
     if (adminData.newPassword !== adminData.confirmPassword) {
-      alert("New password and confirm password do not match");
+      toast.error("New password and confirm password do not match");
       return;
     }
-
     if (adminData.newPassword.length < 6) {
-      alert("Password must be at least 6 characters long");
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
-    console.log("Updating password");
-    alert("Password updated successfully!");
-    setAdminData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    // Add API call here
+    setPasswordLoading(true);
+    try {
+      const res = await fetch("/api/admin", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: adminData.currentPassword,
+          newPassword: adminData.newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update password");
+      toast.success("Password updated successfully!");
+      setAdminData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
-  // Handle New Admin Change
-  const handleNewAdminChange = (e) => {
-    setNewAdmin({ ...newAdmin, [e.target.name]: e.target.value });
-  };
-
-  // Handle Add Admin
-  const handleAddAdmin = () => {
-    if (!newAdmin.name || !newAdmin.email || !newAdmin.password) {
-      alert("Please fill all admin fields");
+  const handleAddAdmin = async () => {
+    if (
+      !newAdmin.name ||
+      !newAdmin.username ||
+      !newAdmin.password ||
+      !newAdmin.confirmPassword
+    ) {
+      toast.error("Please fill all admin fields");
       return;
     }
-
+    if (newAdmin.password !== newAdmin.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
     if (newAdmin.password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
-    console.log("Adding new admin:", newAdmin);
-    alert("New admin added successfully!");
-    setNewAdmin({
-      name: "",
-      email: "",
-      password: "",
-    });
-    // Add API call here
+    setAdminLoading(true);
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newAdmin.name,
+          username: newAdmin.username,
+          password: newAdmin.password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add admin");
+      toast.success("New admin added successfully!");
+      setNewAdmin({
+        name: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setAdminLoading(false);
+    }
   };
+
+  const inputClass =
+    "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-400";
 
   return (
     <div className="p-8 max-w-4xl">
-      {/* Clinic Information */}
-      <section className="bg-white rounded-lg shadow p-6 mb-8">
-        <h3 className="font-semibold text-gray-800 text-lg mb-4">
-          Clinic Information
-        </h3>
-        <div className="grid grid-cols-2 gap-5">
-          <input
-            className="input border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Clinic Name"
-            name="name"
-            value={clinicInfo.name}
-            onChange={handleClinicChange}
-          />
-          <input
-            className="input border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Phone"
-            name="phone"
-            value={clinicInfo.phone}
-            onChange={handleClinicChange}
-          />
-          <input
-            className="input col-span-2 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Address"
-            name="address"
-            value={clinicInfo.address}
-            onChange={handleClinicChange}
-          />
-          <input
-            className="input border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Email"
-            name="email"
-            value={clinicInfo.email}
-            onChange={handleClinicChange}
-          />
-          <input
-            className="input border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Working Hours"
-            name="workingHours"
-            value={clinicInfo.workingHours}
-            onChange={handleClinicChange}
-          />
-        </div>
-        <button
-          onClick={handleClinicUpdate}
-          className="mt-5 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-        >
-          Update Clinic Info
-        </button>
-      </section>
-
-      {/* Add New Admin */}
       <section className="bg-white rounded-lg shadow p-6 mb-8">
         <h3 className="font-semibold text-gray-800 text-lg mb-4">
           Add New Admin
@@ -161,38 +126,50 @@ const Settings = () => {
         <div className="space-y-4 max-w-sm">
           <input
             type="text"
-            className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
             placeholder="Admin Name"
             name="name"
             value={newAdmin.name}
             onChange={handleNewAdminChange}
+            disabled={adminLoading}
           />
           <input
-            type="email"
-            className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Admin Email"
-            name="email"
-            value={newAdmin.email}
+            type="text"
+            className={inputClass}
+            placeholder="Admin Username"
+            name="username"
+            value={newAdmin.username}
             onChange={handleNewAdminChange}
+            disabled={adminLoading}
           />
           <input
             type="password"
-            className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Admin Password"
+            className={inputClass}
+            placeholder="Enter Password"
             name="password"
             value={newAdmin.password}
             onChange={handleNewAdminChange}
+            disabled={adminLoading}
+          />
+          <input
+            type="password"
+            className={inputClass}
+            placeholder="Confirm Password"
+            name="confirmPassword"
+            value={newAdmin.confirmPassword}
+            onChange={handleNewAdminChange}
+            disabled={adminLoading}
           />
           <button
             onClick={handleAddAdmin}
-            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
+            disabled={adminLoading}
+            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Admin
+            {adminLoading ? "Adding..." : "Add Admin"}
           </button>
         </div>
       </section>
 
-      {/* Update Password */}
       <section className="bg-white rounded-lg shadow p-6">
         <h3 className="font-semibold text-gray-800 text-lg mb-4">
           Update Password
@@ -200,33 +177,37 @@ const Settings = () => {
         <div className="space-y-4 max-w-sm">
           <input
             type="password"
-            className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
             placeholder="Current Password"
             name="currentPassword"
             value={adminData.currentPassword}
             onChange={handlePasswordChange}
+            disabled={passwordLoading}
           />
           <input
             type="password"
-            className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
             placeholder="New Password"
             name="newPassword"
             value={adminData.newPassword}
             onChange={handlePasswordChange}
+            disabled={passwordLoading}
           />
           <input
             type="password"
-            className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
             placeholder="Confirm New Password"
             name="confirmPassword"
             value={adminData.confirmPassword}
             onChange={handlePasswordChange}
+            disabled={passwordLoading}
           />
           <button
             onClick={handlePasswordUpdate}
-            className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition"
+            disabled={passwordLoading}
+            className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Update Password
+            {passwordLoading ? "Updating..." : "Update Password"}
           </button>
         </div>
       </section>

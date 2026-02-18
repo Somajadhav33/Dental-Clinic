@@ -1,21 +1,24 @@
-import db from "@/lib/db";
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import Marquee from "react-fast-marquee";
 
-const getReviews = async () => {
-  try {
-    const result = await db.query(
-      "SELECT * FROM reviews ORDER BY created_at DESC",
-    );
-    return result.rows;
-  } catch (error) {
-    console.error("Error fetching reviews:", error);
-    return [];
-  }
-};
+const ReviewsComponent = () => {
+  const [reviews, setReviews] = useState([]);
 
-const ReviewsComponent = async () => {
-  const reviews = await getReviews();
+  useEffect(() => {
+    const getReviews = async () => {
+      try {
+        const response = await fetch("/api/reviews");
+        const data = await response.json();
+        setReviews(data.reviews);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        return [];
+      }
+    };
+
+    getReviews();
+  }, []);
 
   if (!reviews || reviews.length === 0) {
     return null;
